@@ -1,18 +1,32 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { Product } from '../models/product';
 import { Badge } from './badge';
+import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
   imports: [RouterLink, NgOptimizedImage, Badge],
   template: `
-    <a [routerLink]="['/producto', product().slug]" class="group h-full flex flex-col bg-white rounded-2xl shadow-md overflow-hidden transition-shadow hover:shadow-lg">
-      <div class="relative aspect-square bg-stone/10 shrink-0">
-        <img [ngSrc]="product().images[0]" [alt]="product().name" fill class="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:rotate-1" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
-        <span class="absolute top-2 left-2 inline-block text-[0.625rem] font-medium uppercase tracking-wider px-2 py-1 rounded-full" [class]="product().productLine === 'amigurumi' ? 'bg-sage/80 text-white' : 'bg-coral/80 text-white'">{{ product().productLine === 'amigurumi' ? 'Amigurumi' : 'Joyería' }}</span>
+    <div class="bg-white rounded-2xl shadow-md overflow-hidden transition-shadow hover:shadow-lg">
+
+      <!-- Header estilo Instagram -->
+      <div class="flex items-center gap-3 px-3 pt-3 pb-2">
+        <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0"
+          [class]="linea() === 'jewelry' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'">
+          {{ linea() === 'jewelry' ? '💎' : '🧶' }}
+        </span>
+        <div class="min-w-0 flex-1">
+          <p class="font-semibold text-sm leading-tight truncate">{{ product().name }}</p>
+          <p class="text-[0.7rem] text-stone/60 leading-tight">{{ product().category }}</p>
+        </div>
+      </div>
+
+      <!-- Imagen clickable -->
+      <a [routerLink]="['/producto', product().slug]" class="relative block aspect-square bg-stone/10 overflow-hidden">
+        <img [ngSrc]="product().images[0]" [alt]="product().name" fill class="object-cover transition-transform duration-300 hover:scale-105" sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" />
         @if (product().isNew || product().isSale) {
           <div class="absolute top-2 right-2 flex flex-col gap-1">
             @if (product().isNew) {
@@ -23,33 +37,61 @@ import { Badge } from './badge';
             }
           </div>
         }
-      </div>
-      <div class="p-3 min-h-[7.5rem] flex flex-col">
-        <div class="flex-1 flex flex-col justify-between gap-1">
-          <h3 class="font-heading text-[0.9375rem] font-semibold leading-tight min-h-[2.5em]">{{ product().name }}</h3>
-          <span class="text-xs font-medium text-ink min-h-[1.25em]">\${{ product().price.toFixed(2) }}</span>
-        </div>
-        <div class="mt-1.5 flex flex-row flex-wrap gap-2">
-          @if (product().stock > 0) {
-            <button (click)="$event.preventDefault(); $event.stopPropagation(); compartir()" class="hidden sm:inline-flex items-center justify-center w-7 h-7 rounded-full bg-mustard text-white shrink-0" aria-label="Compartir">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </button>
-            <a [routerLink]="['/producto', product().slug]" (click)="$event.stopPropagation()" class="hidden sm:block flex-1 text-center text-xs px-2 py-0.5 rounded-lg border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium">
-              ¡Lo quiero!
-            </a>
-            <button (click)="$event.preventDefault(); $event.stopPropagation(); compartir()" class="sm:hidden inline-flex items-center justify-center w-7 h-7 rounded-full bg-mustard text-white shrink-0" aria-label="Compartir">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </button>
-            <button (click)="$event.preventDefault(); $event.stopPropagation(); quickView.emit(product())" class="sm:hidden flex-1 text-center text-xs px-2 py-[0.3125rem] rounded-lg border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium" aria-label="Ver {{ product().name }}">
-              ¡Lo quiero!
-            </button>
+      </a>
+
+      <!-- Action bar estilo Instagram -->
+      <div class="flex items-center px-3 py-2 gap-2">
+        <button (click)="toggleLike()" class="transition-transform active:scale-125 p-0.5" aria-label="Me gusta">
+          @if (liked()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           } @else {
-            <span class="hidden sm:inline-block text-xs px-2 py-0.5 rounded-lg bg-red-500 text-white font-medium self-start">Sin stock</span>
-            <span class="sm:hidden w-full text-center text-xs px-2 py-[0.3125rem] rounded-lg bg-red-500 text-white font-medium">Sin stock</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A3532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           }
-        </div>
+        </button>
+        <span class="text-xs text-stone/60 font-medium min-w-[1.5rem]">{{ likesCount() }}</span>
+
+        <button (click)="compartir()" class="p-0.5 transition-transform active:scale-125" aria-label="Compartir">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A3532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
+
+        <button (click)="toggleSave()" class="ml-auto p-0.5 transition-transform active:scale-125" aria-label="Guardar">
+          @if (saved()) {
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#9e3fff" stroke="#9e3fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A3532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+          }
+        </button>
       </div>
-    </a>
+
+      <!-- Descripción -->
+      <div class="px-3">
+        <p class="text-sm leading-relaxed text-ink" [class.line-clamp-2]="!showFullDesc()">
+          {{ product().description }}
+        </p>
+        @if (product().description.length > 100) {
+          <button (click)="showFullDesc.set(!showFullDesc())" class="text-xs text-stone/50 hover:text-stone mt-0.5 transition-colors">
+            {{ showFullDesc() ? 'ver menos' : 'ver más' }}
+          </button>
+        }
+      </div>
+
+      <!-- Precio -->
+      <p class="px-3 mt-2 font-bold text-lg text-ink">\${{ product().price.toFixed(2) }}</p>
+
+      <!-- CTA Lo quiero -->
+      <div class="px-3 pb-3 mt-2">
+        @if (product().stock > 0) {
+          <button (click)="addToCart()" class="w-full bg-coral hover:bg-coral/90 text-white py-2.5 rounded-lg font-medium text-sm transition-colors">
+            ¡Lo quiero!
+          </button>
+          <button (click)="$event.stopPropagation(); quickView.emit(product())" class="sm:hidden w-full mt-1.5 text-xs text-center text-stone/50 hover:text-coral transition-colors" aria-label="Vista rápida">
+            Vista rápida
+          </button>
+        } @else {
+          <button disabled class="w-full bg-stone/20 text-stone/50 py-2.5 rounded-lg font-medium text-sm cursor-not-allowed">Sin stock</button>
+        }
+      </div>
+    </div>
   `,
   host: {
     'class': 'block h-full',
@@ -59,6 +101,24 @@ export class ProductCard {
   readonly product = input.required<Product>();
   readonly quickView = output<Product>();
 
+  private cartService = inject(CartService);
+
+  protected readonly liked = signal(false);
+  protected readonly saved = signal(false);
+  protected readonly showFullDesc = signal(false);
+  protected readonly likesCount = signal(Math.floor(Math.random() * 20) + 3);
+
+  protected readonly linea = computed(() => this.product().productLine);
+
+  protected toggleLike(): void {
+    this.liked.update(v => !v);
+    this.likesCount.update(c => c + (this.liked() ? 1 : -1));
+  }
+
+  protected toggleSave(): void {
+    this.saved.update(v => !v);
+  }
+
   protected compartir(): void {
     const url = `${location.origin}/producto/${this.product().slug}`;
     const texto = `Mira el producto que encontré!`;
@@ -67,5 +127,10 @@ export class ProductCard {
     } else {
       navigator.clipboard.writeText(`${texto} ${url}`);
     }
+  }
+
+  protected addToCart(): void {
+    this.cartService.add(this.product());
+    this.quickView.emit(this.product());
   }
 }
