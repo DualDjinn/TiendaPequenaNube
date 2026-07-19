@@ -14,10 +14,13 @@ import { CartService } from '../../core/services/cart.service';
 
       <!-- Header estilo Instagram -->
       <div class="flex items-center gap-3 px-3 pt-3 pb-2">
-        <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0 ring-2 ring-offset-1"
-          [class]="linea() === 'Joyería' ? 'bg-amber-100 text-amber-600 ring-amber-400' : 'bg-green-100 text-green-600 ring-green-400'">
-          {{ linea() === 'Joyería' ? '💎' : '🧶' }}
-        </span>
+        <div class="relative w-10 h-10 shrink-0 rounded-full avatar-ring"
+             [style.background]="lineConfig().gradient">
+          <div class="absolute inset-[2px] rounded-full flex items-center justify-center text-base"
+               [class]="lineConfig().bg + ' ' + lineConfig().text">
+            {{ lineConfig().icon }}
+          </div>
+        </div>
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-sm leading-tight truncate">{{ product().name }}</p>
           <p class="text-[0.7rem] text-stone/60 leading-tight">{{ product().category }}</p>
@@ -90,6 +93,14 @@ import { CartService } from '../../core/services/cart.service';
       </div>
     </div>
   `,
+  styles: [`
+    .avatar-ring {
+      animation: spin-gradient 4s linear infinite;
+    }
+    @keyframes spin-gradient {
+      to { transform: rotate(360deg); }
+    }
+  `],
   host: {
     'class': 'block h-full',
   },
@@ -105,7 +116,24 @@ export class ProductCard {
   protected readonly showFullDesc = signal(false);
   protected readonly likesCount = signal(Math.floor(Math.random() * 20) + 3);
 
-  protected readonly linea = computed(() => this.product().productLine);
+  private readonly lineConfigs: Record<string, { gradient: string; icon: string; bg: string; text: string }> = {
+    'Joyería': {
+      gradient: 'conic-gradient(from 0deg, #FFD700, #FFF8DC, #D8B4FE, #FFD700)',
+      icon: '💎',
+      bg: 'bg-amber-100',
+      text: 'text-amber-600',
+    },
+    'Amigurumi': {
+      gradient: 'conic-gradient(from 0deg, #FED7AA, #FFF7ED, #A7F3D0, #FED7AA)',
+      icon: '🧶',
+      bg: 'bg-green-100',
+      text: 'text-green-600',
+    },
+  };
+
+  protected readonly lineConfig = computed(() =>
+    this.lineConfigs[this.product().productLine] ?? this.lineConfigs['Amigurumi']
+  );
 
   protected toggleLike(): void {
     this.liked.update(v => !v);
