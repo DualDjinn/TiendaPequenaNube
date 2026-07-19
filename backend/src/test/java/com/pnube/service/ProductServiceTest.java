@@ -68,4 +68,27 @@ class ProductServiceTest {
         assertFalse(p.getActivo());
         verify(repository).save(p);
     }
+
+    @Test
+    void update_shouldModifyFields() {
+        Categoria cat = new Categoria(); cat.setId(1L);
+        Product existing = new Product(); existing.setId(1L); existing.setName("Old");
+        Product update = new Product(); update.setName("New"); update.setSlug("new-slug");
+        update.setPrice(200.0); update.setStock(10); update.setDescription("Desc");
+        when(repository.findById(1L)).thenReturn(Optional.of(existing));
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(cat));
+        when(repository.save(any())).thenReturn(existing);
+
+        Product result = productService.update(1L, update, 1L);
+        assertEquals("New", result.getName());
+        assertEquals(200.0, result.getPrice());
+    }
+
+    @Test
+    void delete_shouldCallRepository() {
+        Product p = new Product(); p.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(p));
+        productService.softDelete(1L);
+        verify(repository).save(p);
+    }
 }

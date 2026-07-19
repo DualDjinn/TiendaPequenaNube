@@ -25,9 +25,21 @@ class CategoriaServiceTest {
 
     @Test
     void findByLineaId_shouldReturnCategories() {
-        Categoria c = new Categoria();
-        when(repository.findByLineaIdOrderByNombre(1L)).thenReturn(List.of(c));
+        when(repository.findByLineaIdOrderByNombre(1L)).thenReturn(List.of(new Categoria()));
         assertEquals(1, categoriaService.findByLineaId(1L).size());
+    }
+
+    @Test
+    void findById_shouldReturn() {
+        Categoria c = new Categoria(); c.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(c));
+        assertNotNull(categoriaService.findById(1L));
+    }
+
+    @Test
+    void findById_shouldThrowWhenNotFound() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> categoriaService.findById(99L));
     }
 
     @Test
@@ -48,8 +60,20 @@ class CategoriaServiceTest {
     }
 
     @Test
-    void update_shouldThrowWhenNotFound() {
-        when(repository.findById(99L)).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> categoriaService.update(99L, "New"));
+    void update_shouldModify() {
+        Categoria c = new Categoria(); c.setId(1L); c.setNombre("Old");
+        when(repository.findById(1L)).thenReturn(Optional.of(c));
+        when(repository.save(any())).thenReturn(c);
+        Categoria result = categoriaService.update(1L, "New");
+        assertEquals("New", result.getNombre());
+    }
+
+    @Test
+    void delete_shouldDeactivate() {
+        Categoria c = new Categoria(); c.setActivo(true);
+        when(repository.findById(1L)).thenReturn(Optional.of(c));
+        categoriaService.delete(1L);
+        assertFalse(c.getActivo());
+        verify(repository).save(c);
     }
 }
