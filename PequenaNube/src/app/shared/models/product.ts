@@ -1,4 +1,4 @@
-export type ProductLine = 'amigurumi' | 'jewelry';
+export type ProductLine = 'amigurumi' | 'jewelry' | 'Amigurumi' | 'Joyería';
 
 export interface AmigurumiAttrs {
   yarnType: string;

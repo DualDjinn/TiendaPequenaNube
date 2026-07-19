@@ -15,8 +15,8 @@ import { CartService } from '../../core/services/cart.service';
       <!-- Header estilo Instagram -->
       <div class="flex items-center gap-3 px-3 pt-3 pb-2">
         <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0"
-          [class]="linea() === 'jewelry' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'">
-          {{ linea() === 'jewelry' ? '💎' : '🧶' }}
+          [class]="linea() === 'Joyería' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'">
+          {{ linea() === 'Joyería' ? '💎' : '🧶' }}
         </span>
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-sm leading-tight truncate">{{ product().name }}</p>
@@ -51,7 +51,7 @@ import { CartService } from '../../core/services/cart.service';
         <span class="text-xs text-stone/60 font-medium min-w-[1.5rem]">{{ likesCount() }}</span>
 
         <button (click)="compartir()" class="p-0.5 transition-transform active:scale-125" aria-label="Compartir">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A3532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3A3532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9Z"/></svg>
         </button>
 
         <button (click)="toggleSave()" class="ml-auto p-0.5 transition-transform active:scale-125" aria-label="Guardar">
@@ -83,9 +83,6 @@ import { CartService } from '../../core/services/cart.service';
         @if (product().stock > 0) {
           <button (click)="addToCart()" class="w-full bg-coral hover:bg-coral/90 text-white py-2.5 rounded-lg font-medium text-sm transition-colors">
             ¡Lo quiero!
-          </button>
-          <button (click)="$event.stopPropagation(); quickView.emit(product())" class="sm:hidden w-full mt-1.5 text-xs text-center text-stone/50 hover:text-coral transition-colors" aria-label="Vista rápida">
-            Vista rápida
           </button>
         } @else {
           <button disabled class="w-full bg-stone/20 text-stone/50 py-2.5 rounded-lg font-medium text-sm cursor-not-allowed">Sin stock</button>
