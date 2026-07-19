@@ -13,8 +13,8 @@ import { Component, input, output } from '@angular/core';
       display: inline-flex;
       align-items: center;
       gap: 0;
-      border: 1px solid #d4cfc8;
-      border-radius: 0.375rem;
+      border: 1px solid #9e3fff;
+      border-radius: 0.5rem;
       overflow: hidden;
     }
     button {
@@ -23,11 +23,12 @@ import { Component, input, output } from '@angular/core';
       background: transparent;
       cursor: pointer;
       font-size: 1rem;
-      color: #3A3532;
+      color: #9e3fff;
       transition: background 0.15s;
+      font-weight: 500;
     }
     button:hover:not([disabled]) {
-      background: #F5F0EB;
+      background: rgba(158, 63, 255, 0.1);
     }
     button[disabled] {
       opacity: 0.4;
@@ -37,9 +38,10 @@ import { Component, input, output } from '@angular/core';
       padding: 0.5rem 0.75rem;
       min-width: 2rem;
       text-align: center;
-      font-weight: 500;
-      border-left: 1px solid #d4cfc8;
-      border-right: 1px solid #d4cfc8;
+      font-weight: 600;
+      color: #9e3fff;
+      border-left: 1px solid #9e3fff;
+      border-right: 1px solid #9e3fff;
     }
   `],
 })
