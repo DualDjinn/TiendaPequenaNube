@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { CartService } from '../../core/services/cart.service';
 
 @Component({
   selector: 'app-checkout-success',
@@ -27,6 +28,7 @@ import { HttpClient } from '@angular/common/http';
 export class CheckoutSuccess implements OnInit {
   private route = inject(ActivatedRoute);
   private http = inject(HttpClient);
+  private cartService = inject(CartService);
   protected loading = signal(true);
   protected confirmed = signal(false);
 
@@ -34,7 +36,7 @@ export class CheckoutSuccess implements OnInit {
     const paymentId = this.route.snapshot.queryParamMap.get('payment_id');
     if (paymentId) {
       this.http.post('/api/mercadopago/confirm', { paymentId: Number(paymentId) }).subscribe({
-        next: () => { this.loading.set(false); this.confirmed.set(true); },
+        next: () => { this.cartService.clear(); this.loading.set(false); this.confirmed.set(true); },
         error: () => { this.loading.set(false); },
       });
     } else {
