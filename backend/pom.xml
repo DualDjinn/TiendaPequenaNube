@@ -114,18 +114,13 @@
             <goals><goal>check</goal></goals>
             <configuration>
               <excludes>
-                <exclude>com/pnube/entity/*</exclude>
-                <exclude>com/pnube/dto/*</exclude>
-                <exclude>com/pnube/repository/*</exclude>
-                <exclude>com/pnube/controller/*</exclude>
-                <exclude>com/pnube/PnubeApplication</exclude>
-                <exclude>com/pnube/config/*</exclude>
+                <exclude>com/pnube/PnubeApplication*</exclude>
               </excludes>
               <rules>
                 <rule>
-                  <element>BUNDLE</element>
+                  <element>PACKAGE</element>
                   <limits>
-                    <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.70</minimum></limit>
+                    <limit><counter>LINE</counter><value>COVEREDRATIO</value><minimum>0.90</minimum></limit>
                   </limits>
                 </rule>
               </rules>

@@ -1,6 +1,8 @@
 package com.pnube.service;
 
-import com.pnube.entity.*;
+import com.pnube.entity.DetalleVenta;
+import com.pnube.entity.Product;
+import com.pnube.entity.Venta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,8 +29,6 @@ class MercadoPagoServiceTest {
 
     @Test
     void init_shouldSetAccessToken() {
-        mpService.init();
-        // No exception means access token was set
         assertDoesNotThrow(() -> mpService.init());
     }
 
@@ -39,7 +39,11 @@ class MercadoPagoServiceTest {
         Product p = new Product(); p.setId(1L); p.setName("Test"); p.setPrice(100.0);
         dv.setProducto(p); dv.setCantidad(1); dv.setPrecioUnitario(100.0);
         v.setDetalles(List.of(dv));
-
         assertThrows(RuntimeException.class, () -> mpService.crearPreferencia(v));
+    }
+
+    @Test
+    void consultarPago_shouldThrowWhenMpFails() {
+        assertThrows(RuntimeException.class, () -> mpService.consultarPago(999L));
     }
 }

@@ -39,6 +39,25 @@ class VentaServiceTest {
     }
 
     @Test
+    void crearCheckout_shouldSucceed() {
+        CheckoutRequest req = new CheckoutRequest();
+        req.setNombre("Test"); req.setDireccion("Dir"); req.setTelefono("123");
+        CheckoutRequest.Item item = new CheckoutRequest.Item();
+        item.setProductId(1L); item.setCantidad(2);
+        req.setItems(List.of(item));
+        Product p = new Product(); p.setId(1L); p.setStock(10); p.setPrice(100.0);
+        Venta savedVenta = new Venta(); savedVenta.setId(1L);
+        when(ventaRepository.save(any())).thenReturn(savedVenta);
+        when(productRepository.findById(1L)).thenReturn(Optional.of(p));
+        when(mpService.crearPreferencia(any())).thenReturn(
+            new com.pnube.dto.CheckoutResponse("pref", "https://mp.com"));
+
+        var result = ventaService.crearCheckout(req);
+        assertNotNull(result);
+        assertEquals("pref", result.getPreferenceId());
+    }
+
+    @Test
     void crearCheckout_shouldThrowWhenInsufficientStock() {
         CheckoutRequest req = new CheckoutRequest();
         req.setNombre("Test"); req.setDireccion("Dir"); req.setTelefono("123");
@@ -48,6 +67,14 @@ class VentaServiceTest {
         Product p = new Product(); p.setId(1L); p.setStock(2); p.setPrice(100.0);
         when(productRepository.findById(1L)).thenReturn(Optional.of(p));
         assertThrows(RuntimeException.class, () -> ventaService.crearCheckout(req));
+    }
+
+    @Test
+    void getVentasDelDia_shouldReturnDefaults() {
+        when(ventaRepository.findVentasDelDia(any(), any())).thenReturn(List.of());
+        var result = ventaService.getVentasDelDia(null, null, null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -95,6 +122,46 @@ class VentaServiceTest {
 
         ventaService.confirmarPago("payment", 123L);
         assertEquals(Venta.Estado.RECHAZADO, v.getEstado());
+    }
+
+    @Test
+    void confirmarPago_shouldSkipNonPaymentTopic() {
+        ventaService.confirmarPago("merchant_order", 123L);
+        verifyNoInteractions(mpService);
+    }
+
+    @Test
+    void confirmarPago_shouldRefund() {
+        MercadoPagoService.PaymentInfo info =
+            new MercadoPagoService.PaymentInfo("1", "refunded");
+        when(mpService.consultarPago(123L)).thenReturn(info);
+        Product p = new Product(); p.setId(1L); p.setStock(5);
+        DetalleVenta dv = new DetalleVenta();
+        dv.setCantidad(2); dv.setPrecioUnitario(100.0); dv.setProducto(p);
+        Venta v = new Venta(); v.setId(1L); v.setEstado(Venta.Estado.PENDIENTE);
+        v.setDetalles(List.of(dv));
+        when(ventaRepository.findById(1L)).thenReturn(Optional.of(v));
+
+        ventaService.confirmarPago("payment", 123L);
+        assertEquals(Venta.Estado.REEMBOLSADO, v.getEstado());
+        assertEquals(7, p.getStock());
+    }
+
+    @Test
+    void confirmarPagoPorPaymentId_shouldApprove() {
+        MercadoPagoService.PaymentInfo info =
+            new MercadoPagoService.PaymentInfo("1", "approved");
+        when(mpService.consultarPago(123L)).thenReturn(info);
+        Product p = new Product(); p.setId(1L); p.setStock(5);
+        DetalleVenta dv = new DetalleVenta();
+        dv.setCantidad(2); dv.setPrecioUnitario(100.0); dv.setProducto(p);
+        Venta v = new Venta(); v.setId(1L); v.setEstado(Venta.Estado.PENDIENTE);
+        v.setDetalles(List.of(dv));
+        when(ventaRepository.findById(1L)).thenReturn(Optional.of(v));
+        when(productRepository.save(any())).thenReturn(p);
+
+        ventaService.confirmarPagoPorPaymentId(123L);
+        assertEquals(Venta.Estado.APROBADO, v.getEstado());
     }
 
     @Test
