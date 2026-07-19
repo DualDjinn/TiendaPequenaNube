@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { ProductService } from '../../core/services/product.service';
@@ -76,26 +76,24 @@ export class ProductDetail implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
 
-  protected readonly product = signal<Product | undefined>(undefined);
+  private readonly slug = signal<string | undefined>(undefined);
   protected readonly quantity = signal(1);
-  protected readonly loading = signal(true);
+
+  protected readonly product = computed(() => {
+    const s = this.slug();
+    return s ? this.productService.getBySlug(s) : undefined;
+  });
+
+  protected readonly loading = computed(() => {
+    const s = this.slug();
+    return !!s && !this.product() && this.productService.loading();
+  });
 
   ngOnInit(): void {
     this.productService.loadAll();
     this.route.paramMap.subscribe(params => {
-      const slug = params.get('slug');
       this.quantity.set(1);
-      if (!slug) { this.loading.set(false); return; }
-      const p = this.productService.getBySlug(slug);
-      if (p) { this.product.set(p); this.loading.set(false); return; }
-      const eff = effect(() => {
-        const found = this.productService.getBySlug(slug);
-        if (found) { this.product.set(found); this.loading.set(false); eff.destroy(); }
-        else if (!this.productService.loading()) {
-          this.loading.set(false);
-          eff.destroy();
-        }
-      });
+      this.slug.set(params.get('slug') ?? undefined);
     });
   }
 
