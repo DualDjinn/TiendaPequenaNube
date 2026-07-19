@@ -91,6 +91,10 @@ export class ProductDetail implements OnInit {
       const eff = effect(() => {
         const found = this.productService.getBySlug(slug);
         if (found) { this.product.set(found); this.loading.set(false); eff.destroy(); }
+        else if (!this.productService.loading()) {
+          this.loading.set(false);
+          eff.destroy();
+        }
       });
     });
   }
