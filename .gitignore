@@ -1,0 +1,30 @@
+# Backend
+backend/data/
+backend/target/
+*.class
+*.jar
+*.war
+
+# Frontend
+PequenaNube/node_modules/
+PequenaNube/dist/
+PequenaNube/.angular/
+PequenaNube/tmp/
+PequenaNube/out-tsc/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Env
+.env

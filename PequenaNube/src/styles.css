@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #3A3532;
+}
+
+@keyframes fade-in-carousel {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fade-in {
+  animation: fade-in-carousel 0.5s ease-out;
+}
+
+@keyframes shinySweep {
+  0% { mask-position: 200%; -webkit-mask-position: 200%; }
+  100% { mask-position: -100%; -webkit-mask-position: -100%; }
+}
+.animate-rainbow-shine {
+  -webkit-text-stroke: 4px rgba(0,0,0,0.6);
+  background: linear-gradient(90deg, #FF6B6B, #FFD93D, #6BCB77, #4D96FF, #9B59B6, #FF6B6B);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-mask-image: linear-gradient(to right, transparent 30%, #000 50%, transparent 70%);
+  mask-image: linear-gradient(to right, transparent 30%, #000 50%, transparent 70%);
+  -webkit-mask-size: 200% auto;
+  mask-size: 200% auto;
+  animation: shinySweep 6.7s ease-in-out infinite, rainbowBg 4s linear infinite;
+}
+
+@keyframes rainbowBg {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+
