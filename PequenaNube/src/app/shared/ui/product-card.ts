@@ -61,10 +61,11 @@ export class ProductCard {
 
   protected compartir(): void {
     const url = `${location.origin}/producto/${this.product().slug}`;
+    const texto = `Mira el producto que encontré!`;
     if (navigator.share) {
-      navigator.share({ title: this.product().name, url });
+      navigator.share({ title: this.product().name, text: texto, url });
     } else {
-      navigator.clipboard.writeText(url);
+      navigator.clipboard.writeText(`${texto} ${url}`);
     }
   }
 }
