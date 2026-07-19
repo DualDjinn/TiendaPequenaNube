@@ -34,7 +34,7 @@ import { Badge } from './badge';
             <a [routerLink]="['/producto', product().slug]" (click)="$event.stopPropagation()" class="hidden sm:inline-block shrink-0 text-xs px-2 py-0.5 rounded border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium self-start">
               ¡Lo quiero!
             </a>
-            <button (click)="$event.stopPropagation(); quickView.emit(product())" class="sm:hidden w-full text-xs px-2 py-[0.3125rem] rounded border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium" aria-label="Ver {{ product().name }}">
+            <button (click)="$event.preventDefault(); $event.stopPropagation(); quickView.emit(product())" class="sm:hidden w-full text-xs px-2 py-[0.3125rem] rounded border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium" aria-label="Ver {{ product().name }}">
               ¡Lo quiero!
             </button>
           } @else {

@@ -14,7 +14,11 @@ import { Product } from '../../shared/models/product';
   imports: [NgOptimizedImage, ProductCard, QuantitySelector, ScrollRevealDirective],
   template: `
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      @if (!product()) {
+      @if (loading()) {
+        <div class="text-center py-16">
+          <p class="text-stone">Cargando...</p>
+        </div>
+      } @else if (!product()) {
         <div class="text-center py-16">
           <p class="text-stone">Producto no encontrado</p>
         </div>
@@ -74,18 +78,19 @@ export class ProductDetail implements OnInit {
 
   protected readonly product = signal<Product | undefined>(undefined);
   protected readonly quantity = signal(1);
+  protected readonly loading = signal(true);
 
   ngOnInit(): void {
     this.productService.loadAll();
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug');
       this.quantity.set(1);
-      if (!slug) return;
+      if (!slug) { this.loading.set(false); return; }
       const p = this.productService.getBySlug(slug);
-      if (p) { this.product.set(p); return; }
+      if (p) { this.product.set(p); this.loading.set(false); return; }
       const eff = effect(() => {
         const found = this.productService.getBySlug(slug);
-        if (found) { this.product.set(found); eff.destroy(); }
+        if (found) { this.product.set(found); this.loading.set(false); eff.destroy(); }
       });
     });
   }
