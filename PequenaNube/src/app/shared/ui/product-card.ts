@@ -24,7 +24,7 @@ import { Badge } from './badge';
           </div>
         }
       </div>
-      <div class="p-3 h-[6.875rem] flex flex-col overflow-hidden">
+      <div class="p-3 min-h-[7.5rem] flex flex-col">
         <div class="flex-1 flex flex-col justify-between gap-1">
           <h3 class="font-heading text-[0.9375rem] font-semibold leading-tight min-h-[2.5em]">{{ product().name }}</h3>
           <span class="text-xs font-medium text-ink min-h-[1.25em]">\${{ product().price.toFixed(2) }}</span>
