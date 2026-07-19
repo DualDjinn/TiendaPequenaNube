@@ -2,7 +2,7 @@
   "buildCommand": "ng build",
   "outputDirectory": "dist/pnube/browser",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://tiendapequenanube.com.ar/api/$1" },
+    { "source": "/api/(.*)", "destination": "https://tiendapequenanube-production.up.railway.app/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
