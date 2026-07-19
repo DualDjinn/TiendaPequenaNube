@@ -14,8 +14,8 @@ import { CartService } from '../../core/services/cart.service';
 
       <!-- Header estilo Instagram -->
       <div class="flex items-center gap-3 px-3 pt-3 pb-2">
-        <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0"
-          [class]="linea() === 'Joyería' ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'">
+        <span class="w-9 h-9 rounded-full flex items-center justify-center text-base shrink-0 ring-2 ring-offset-1"
+          [class]="linea() === 'Joyería' ? 'bg-amber-100 text-amber-600 ring-amber-400' : 'bg-green-100 text-green-600 ring-green-400'">
           {{ linea() === 'Joyería' ? '💎' : '🧶' }}
         </span>
         <div class="min-w-0 flex-1">
