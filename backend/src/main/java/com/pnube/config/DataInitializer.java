@@ -2,6 +2,8 @@ package com.pnube.config;
 
 import com.pnube.entity.*;
 import com.pnube.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +16,7 @@ import java.util.Map;
 @Component
 public class DataInitializer implements CommandLineRunner {
 
+    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final LineaRepository lineaRepository;
@@ -41,7 +44,12 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0) {
+            if (adminPassword == null || adminPassword.isBlank()) {
+                log.warn("ADMIN_PASSWORD not configured - skipping admin user creation");
+                return;
+            }
             userRepository.save(new User(adminUsername, passwordEncoder.encode(adminPassword), "ADMIN"));
+            log.info("Admin user '{}' created", adminUsername);
         }
 
         if (productRepository.count() > 0) return;

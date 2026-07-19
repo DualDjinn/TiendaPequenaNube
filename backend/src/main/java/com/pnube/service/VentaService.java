@@ -7,7 +7,8 @@ import com.pnube.entity.*;
 import com.pnube.repository.DetalleVentaRepository;
 import com.pnube.repository.ProductRepository;
 import com.pnube.repository.VentaRepository;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 public class VentaService {
 
+    private static final Logger log = LoggerFactory.getLogger(VentaService.class);
     private final VentaRepository ventaRepository;
     private final DetalleVentaRepository detalleVentaRepository;
     private final ProductRepository productRepository;
@@ -73,8 +75,10 @@ public class VentaService {
     public void confirmarPago(String topic, Long id) {
         if (!"payment".equals(topic)) return;
         var paymentInfo = mpService.consultarPago(id);
-        Venta venta = ventaRepository.findByMpPreferenceId(paymentInfo.getPreferenceId())
-                .orElseThrow(() -> new RuntimeException("Venta no encontrada para preference: " + paymentInfo.getPreferenceId()));
+        Long ventaId = Long.valueOf(paymentInfo.getPreferenceId());
+        log.info("Confirming payment for ventaId: {}", ventaId);
+        Venta venta = ventaRepository.findById(ventaId)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada: " + ventaId));
 
         if (venta.getEstado() != Venta.Estado.PENDIENTE) return;
 
@@ -105,8 +109,10 @@ public class VentaService {
         var paymentInfo = mpService.consultarPago(paymentId);
         if (!"approved".equals(paymentInfo.getStatus())) return;
 
-        Venta venta = ventaRepository.findByMpPreferenceId(paymentInfo.getPreferenceId())
-                .orElseThrow(() -> new RuntimeException("Venta no encontrada para preference: " + paymentInfo.getPreferenceId()));
+        Long ventaId = Long.valueOf(paymentInfo.getPreferenceId());
+        log.info("Confirming payment by paymentId {} for ventaId: {}", paymentId, ventaId);
+        Venta venta = ventaRepository.findById(ventaId)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada: " + ventaId));
 
         if (venta.getEstado() != Venta.Estado.PENDIENTE) return;
 

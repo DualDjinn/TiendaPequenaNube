@@ -103,7 +103,7 @@ export class Cart {
     if (!this.checkoutNombre || !this.checkoutDireccion || !this.checkoutTelefono) return;
     this.checkoutLoading.set(true);
     const items = this.items().map(i => ({ productId: i.product.id, cantidad: i.quantity }));
-    console.log('Checkout request:', JSON.stringify({ nombre: this.checkoutNombre, direccion: this.checkoutDireccion, telefono: this.checkoutTelefono, items }));
+
     this.ventaService.checkout({ nombre: this.checkoutNombre, direccion: this.checkoutDireccion, telefono: this.checkoutTelefono, items })
       .subscribe({
         next: res => { window.location.href = res.initPoint; },
