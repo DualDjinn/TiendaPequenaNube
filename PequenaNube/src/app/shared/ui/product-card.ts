@@ -34,14 +34,14 @@ import { Badge } from './badge';
             <a [routerLink]="['/producto', product().slug]" (click)="$event.stopPropagation()" class="hidden sm:inline-block shrink-0 text-xs px-2 py-0.5 rounded-lg border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium self-start">
               ¡Lo quiero!
             </a>
-            <button (click)="$event.stopPropagation(); compartir()" class="hidden sm:inline-block shrink-0 px-2 py-0.5 rounded-lg border border-stone/30 text-stone hover:bg-stone/10 transition-colors" aria-label="Compartir">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <button (click)="$event.stopPropagation(); compartir()" class="hidden sm:inline-flex items-center justify-center w-7 h-7 rounded-full border border-stone/30 text-stone hover:bg-stone/10 transition-colors shrink-0" aria-label="Compartir">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
             <button (click)="$event.preventDefault(); $event.stopPropagation(); quickView.emit(product())" class="sm:hidden w-full text-xs px-2 py-[0.3125rem] rounded-lg border border-coral text-coral hover:bg-coral hover:text-white transition-colors font-medium" aria-label="Ver {{ product().name }}">
               ¡Lo quiero!
             </button>
-            <button (click)="$event.stopPropagation(); compartir()" class="sm:hidden shrink-0 px-2 py-[0.3125rem] rounded-lg border border-stone/30 text-stone hover:bg-stone/10 transition-colors" aria-label="Compartir">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <button (click)="$event.stopPropagation(); compartir()" class="sm:hidden inline-flex items-center justify-center w-7 h-7 rounded-full border border-stone/30 text-stone hover:bg-stone/10 transition-colors shrink-0" aria-label="Compartir">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
             </button>
           } @else {
             <span class="hidden sm:inline-block text-xs px-2 py-0.5 rounded-lg bg-red-500 text-white font-medium self-start">Sin stock</span>
