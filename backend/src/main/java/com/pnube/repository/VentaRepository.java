@@ -22,11 +22,11 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
            "ORDER BY total DESC")
     List<Object[]> findRanking(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta);
 
-    @Query("SELECT FUNCTION('MONTH', v.fecha), FUNCTION('YEAR', v.fecha), SUM(dv.cantidad * dv.precioUnitario) " +
+    @Query("SELECT year(v.fecha), month(v.fecha), SUM(dv.cantidad * dv.precioUnitario) " +
            "FROM Venta v JOIN v.detalles dv " +
            "WHERE v.estado = 'APROBADO' " +
            "AND v.fecha BETWEEN :desde AND :hasta " +
-           "GROUP BY FUNCTION('MONTH', v.fecha), FUNCTION('YEAR', v.fecha) " +
-           "ORDER BY FUNCTION('YEAR', v.fecha), FUNCTION('MONTH', v.fecha)")
+           "GROUP BY year(v.fecha), month(v.fecha) " +
+           "ORDER BY year(v.fecha), month(v.fecha)")
     List<Object[]> findEvolucionMensual(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta);
 }
