@@ -16,7 +16,7 @@ import { CartService } from '../../core/services/cart.service';
       <div class="flex items-center gap-3 px-3 pt-3 pb-2">
         <div class="relative w-10 h-10 shrink-0 rounded-full avatar-ring"
              [style.background]="lineConfig().gradient">
-          <div class="absolute inset-[2px] rounded-full flex items-center justify-center text-base"
+          <div class="absolute inset-[2px] rounded-full flex items-center justify-center text-base avatar-inner"
                [class]="lineConfig().bg + ' ' + lineConfig().text">
             {{ lineConfig().icon }}
           </div>
@@ -97,8 +97,14 @@ import { CartService } from '../../core/services/cart.service';
     .avatar-ring {
       animation: spin-gradient 4s linear infinite;
     }
+    .avatar-inner {
+      animation: counter-spin 4s linear infinite;
+    }
     @keyframes spin-gradient {
       to { transform: rotate(360deg); }
+    }
+    @keyframes counter-spin {
+      to { transform: rotate(-360deg); }
     }
   `],
   host: {
@@ -131,9 +137,10 @@ export class ProductCard {
     },
   };
 
-  protected readonly lineConfig = computed(() =>
-    this.lineConfigs[this.product().productLine] ?? this.lineConfigs['Amigurumi']
-  );
+  protected readonly lineConfig = computed(() => {
+    const pl = this.product().productLine.normalize('NFC');
+    return this.lineConfigs[pl] ?? this.lineConfigs['Amigurumi'];
+  });
 
   protected toggleLike(): void {
     this.liked.update(v => !v);
