@@ -1,0 +1,10 @@
+{
+  "buildCommand": "ng build",
+  "outputDirectory": "dist/pnube",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://tiendapequenanube.com.ar/api/$1"
+    }
+  ]
+}
