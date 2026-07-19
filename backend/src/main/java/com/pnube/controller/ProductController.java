@@ -19,6 +19,12 @@ public class ProductController {
     @GetMapping
     public List<Product> getAll() { return productService.findAll(); }
 
+    @GetMapping("/by-slug/{slug}")
+    public ResponseEntity<Product> getBySlug(@PathVariable String slug) {
+        try { return ResponseEntity.ok(productService.findBySlug(slug)); }
+        catch (RuntimeException e) { return ResponseEntity.notFound().build(); }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
         try { return ResponseEntity.ok(productService.findById(id)); }

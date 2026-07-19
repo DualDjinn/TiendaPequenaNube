@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, effect } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { ProductService } from '../../core/services/product.service';
@@ -80,7 +80,13 @@ export class ProductDetail implements OnInit {
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug');
       this.quantity.set(1);
-      this.product.set(slug ? this.productService.getBySlug(slug) : undefined);
+      if (!slug) return;
+      const p = this.productService.getBySlug(slug);
+      if (p) { this.product.set(p); return; }
+      const eff = effect(() => {
+        const found = this.productService.getBySlug(slug);
+        if (found) { this.product.set(found); eff.destroy(); }
+      });
     });
   }
 
