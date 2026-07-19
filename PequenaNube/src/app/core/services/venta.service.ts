@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CheckoutRequest, CheckoutResponse, RankingResponse } from '../../shared/models/venta';
+import { CheckoutRequest, CheckoutResponse, RankingResponse, VentaDelDia } from '../../shared/models/venta';
 
 @Injectable({ providedIn: 'root' })
 export class VentaService {
@@ -10,5 +10,9 @@ export class VentaService {
 
   getRanking(mes: number, anio: number) {
     return this.http.get<RankingResponse>(`/api/admin/ventas/ranking?mes=${mes}&anio=${anio}`);
+  }
+
+  getVentasDelDia() {
+    return this.http.get<VentaDelDia[]>('/api/admin/ventas/del-dia');
   }
 }

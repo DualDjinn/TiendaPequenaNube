@@ -3,11 +3,13 @@ package com.pnube.controller;
 import com.pnube.dto.CheckoutRequest;
 import com.pnube.dto.CheckoutResponse;
 import com.pnube.dto.RankingResponse;
+import com.pnube.dto.VentaDelDiaResponse;
 import com.pnube.service.VentaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,5 +36,13 @@ public class VentaController {
         if (mes == null) mes = java.time.LocalDate.now().getMonthValue();
         if (anio == null) anio = java.time.LocalDate.now().getYear();
         return ResponseEntity.ok(ventaService.getRanking(mes, anio));
+    }
+
+    @GetMapping("/api/admin/ventas/del-dia")
+    public ResponseEntity<List<VentaDelDiaResponse>> ventasDelDia(
+            @RequestParam(required = false) Integer dia,
+            @RequestParam(required = false) Integer mes,
+            @RequestParam(required = false) Integer anio) {
+        return ResponseEntity.ok(ventaService.getVentasDelDia(dia, mes, anio));
     }
 }

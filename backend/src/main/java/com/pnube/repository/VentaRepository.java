@@ -14,6 +14,9 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
 
     Optional<Venta> findByMpPreferenceId(String mpPreferenceId);
 
+    @Query("SELECT v FROM Venta v WHERE v.estado = 'APROBADO' AND v.fecha BETWEEN :desde AND :hasta ORDER BY v.fecha DESC")
+    List<Venta> findVentasDelDia(@Param("desde") LocalDateTime desde, @Param("hasta") LocalDateTime hasta);
+
     @Query("SELECT dv.producto.id, dv.producto.name, SUM(dv.cantidad) as total " +
            "FROM DetalleVenta dv " +
            "WHERE dv.venta.estado = 'APROBADO' " +

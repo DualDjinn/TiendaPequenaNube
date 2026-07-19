@@ -3,6 +3,7 @@ package com.pnube.service;
 import com.pnube.dto.CheckoutRequest;
 import com.pnube.dto.CheckoutResponse;
 import com.pnube.dto.RankingResponse;
+import com.pnube.dto.VentaDelDiaResponse;
 import com.pnube.entity.*;
 import com.pnube.repository.DetalleVentaRepository;
 import com.pnube.repository.ProductRepository;
@@ -12,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,6 +127,23 @@ public class VentaService {
             productRepository.save(p);
         });
         ventaRepository.save(venta);
+    }
+
+    public List<VentaDelDiaResponse> getVentasDelDia(Integer dia, Integer mes, Integer anio) {
+        if (anio == null) anio = LocalDate.now().getYear();
+        if (mes == null) mes = LocalDate.now().getMonthValue();
+        if (dia == null) dia = LocalDate.now().getDayOfMonth();
+        LocalDateTime desde = LocalDateTime.of(anio, mes, dia, 0, 0);
+        LocalDateTime hasta = desde.plusDays(1);
+        return ventaRepository.findVentasDelDia(desde, hasta).stream()
+                .map(v -> {
+                    int cantidad = v.getDetalles().stream().mapToInt(DetalleVenta::getCantidad).sum();
+                    double total = v.getDetalles().stream()
+                            .mapToDouble(d -> d.getCantidad() * d.getPrecioUnitario()).sum();
+                    return new VentaDelDiaResponse(v.getId(), v.getFecha(), v.getNombre(),
+                            v.getDireccion(), v.getTelefono(), v.getMpPaymentId(), total, cantidad);
+                })
+                .collect(Collectors.toList());
     }
 
     public RankingResponse getRanking(Integer mes, Integer anio) {
