@@ -2,9 +2,9 @@
 
 ## Estado del proyecto
 
-**Backend**: ✅ Spring Boot 4.1.0 con Maven (compila y corre en :8080)
-**Frontend**: ✅ `ng build` exitoso (Angular 21 en :4200)
-**Tests**: ✅ 9 tests pasan (2 suites)
+**Backend**: ✅ Spring Boot 4.1.0 + PostgreSQL (via Railway)
+**Frontend**: ✅ Angular 21 standalone (via Vercel)
+**Deploy**: ✅ Railway (backend) + Vercel (frontend)
 **GitHub**: ✅ https://github.com/DualDjinn/TiendaPequenaNube
 
 ---
@@ -13,110 +13,117 @@
 
 ```
 PequenaNube/
-├── .env.example                            # Variables de entorno de ejemplo
-├── .gitignore                              # Reglas de git (excluye secrets, build, etc.)
-├── backend/                                # Spring Boot 4.1.0 + H2
-│   ├── pom.xml                             # Dependencias (incluye SDK Mercado Pago)
+├── .env.example
+├── .gitignore
+├── vercel.json                              # Root directory → PequenaNube/
+├── backend/                                 # Spring Boot 4.1.0 + PostgreSQL
+│   ├── pom.xml                              # Dependencias (PostgreSQL, JWT, Mercado Pago)
+│   ├── Dockerfile                           # Multi-stage JDK 21
+│   ├── system.properties                    # Java 21
 │   ├── src/main/resources/
-│   │   └── application.yml                 # Config con env vars para secrets
+│   │   └── application.yml                  # Config con env vars (sin defaults)
 │   └── src/main/java/com/pnube/
 │       ├── PnubeApplication.java
 │       ├── config/
-│       │   ├── SecurityConfig.java         # JWT filter chain + CORS + rutas públicas
-│       │   └── DataInitializer.java        # Seed: admin + 2 Líneas + 8 Categorías + 25 productos
+│       │   ├── SecurityConfig.java          # JWT filter chain + CORS + rutas públicas
+│       │   ├── DataInitializer.java         # Seed: admin + 2 Líneas + 8 Categorías + 25 productos
+│       │   ├── GlobalExceptionHandler.java  # Manejo global de errores
+│       │   └── ResourceNotFoundException.java
 │       ├── entity/
-│       │   ├── Product.java                # FK a Categoria, activo (soft delete), @Transient productLine/category
+│       │   ├── Product.java
 │       │   ├── User.java
-│       │   ├── Linea.java                  # id, nombre, activo
-│       │   ├── Categoria.java              # id, nombre, activo, FK Linea
-│       │   ├── Venta.java                  # fecha, estado, mpPreferenceId, mpPaymentId, datos envío
-│       │   └── DetalleVenta.java           # FK Venta + Producto, cantidad, precioUnitario
+│       │   ├── Linea.java
+│       │   ├── Categoria.java
+│       │   ├── Venta.java
+│       │   └── DetalleVenta.java
 │       ├── repository/
 │       │   ├── ProductRepository.java
 │       │   ├── UserRepository.java
 │       │   ├── LineaRepository.java
 │       │   ├── CategoriaRepository.java
-│       │   ├── VentaRepository.java        # + consultas ranking
+│       │   ├── VentaRepository.java
 │       │   └── DetalleVentaRepository.java
 │       ├── security/
-│       │   ├── JwtTokenProvider.java
-│       │   └── JwtAuthenticationFilter.java
+│       │   ├── JwtTokenProvider.java        # Valida JWT_SECRET configurado
+│       │   └── JwtAuthenticationFilter.java # Verifica usuario + rol real en BD
 │       ├── controller/
-│       │   ├── AuthController.java         # POST /api/auth/login
-│       │   ├── ProductController.java      # CRUD /api/products con soft delete
-│       │   ├── LineaController.java        # CRUD /api/lineas (admin)
-│       │   ├── CategoriaController.java    # CRUD /api/categorias (admin)
-│       │   ├── VentaController.java        # POST /api/ventas (checkout)
-│       │   └── MercadoPagoController.java  # POST /api/mercadopago/webhook + /confirm
+│       │   ├── AuthController.java
+│       │   ├── ProductController.java       # + GET /api/products/by-slug/{slug}
+│       │   ├── LineaController.java
+│       │   ├── CategoriaController.java
+│       │   ├── VentaController.java         # + GET /api/admin/ventas/ranking
+│       │   └── MercadoPagoController.java
 │       ├── service/
 │       │   ├── AuthService.java
 │       │   ├── ProductService.java
 │       │   ├── LineaService.java
 │       │   ├── CategoriaService.java
-│       │   ├── VentaService.java           # Checkout + confirmar pago + ranking
-│       │   └── MercadoPagoService.java     # Crear preferencia, consultar pago
+│       │   ├── VentaService.java
+│       │   └── MercadoPagoService.java
 │       └── dto/
 │           ├── LoginRequest.java / LoginResponse.java
 │           ├── CheckoutRequest.java / CheckoutResponse.java
 │           └── RankingResponse.java
-├── PequenaNube/                            # Angular 21 standalone
+├── PequenaNube/                             # Angular 21 standalone
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── core/services/
-│   │   │   │   ├── auth.service.ts         # Login/logout + JWT sessionStorage
-│   │   │   │   ├── auth.interceptor.ts     # Bearer token en cada request
-│   │   │   │   ├── cart.service.ts         # Estado del carrito con signals
+│   │   │   │   ├── auth.service.ts
+│   │   │   │   ├── auth.interceptor.ts
+│   │   │   │   ├── cart.service.ts
 │   │   │   │   ├── cart-drawer.service.ts
-│   │   │   │   ├── product.service.ts      # HTTP + signals + softDelete
-│   │   │   │   ├── linea.service.ts        # CRUD líneas
-│   │   │   │   ├── categoria.service.ts    # CRUD categorías
-│   │   │   │   ├── venta.service.ts        # Checkout + ranking
-│   │   │   │   ├── cart-persistence.ts     # Interfaz + InjectionToken
+│   │   │   │   ├── product.service.ts
+│   │   │   │   ├── linea.service.ts
+│   │   │   │   ├── categoria.service.ts
+│   │   │   │   ├── venta.service.ts
+│   │   │   │   ├── cart-persistence.ts
 │   │   │   │   └── local-storage-cart-persistence.ts
 │   │   │   ├── shared/models/
-│   │   │   │   ├── product.ts              # + categoriaId, activo
+│   │   │   │   ├── product.ts
 │   │   │   │   ├── cart-item.ts
-│   │   │   │   ├── linea.ts                # Interface Linea
-│   │   │   │   ├── categoria.ts            # Interface Categoria
-│   │   │   │   └── venta.ts                # CheckoutRequest, CheckoutResponse, RankingResponse
+│   │   │   │   ├── linea.ts
+│   │   │   │   ├── categoria.ts
+│   │   │   │   └── venta.ts
 │   │   │   ├── shared/ui/
-│   │   │   │   ├── badge.ts / button.ts / skeleton.ts
+│   │   │   │   ├── badge.ts / skeleton.ts
 │   │   │   │   ├── quantity-selector.ts
-│   │   │   │   ├── product-card.ts         # 65/35 split, tags apiladas, botón al fondo
-│   │   │   │   ├── quick-view.ts           # Bottom sheet mobile con galería + agregar
-│   │   │   │   └── whatsapp-bubble.ts      # Botón flotante WhatsApp
+│   │   │   │   ├── product-card.ts
+│   │   │   │   ├── quick-view.ts
+│   │   │   │   └── whatsapp-bubble.ts
 │   │   │   ├── shared/directives/
 │   │   │   │   └── scroll-reveal.directive.ts
 │   │   │   ├── layout/
-│   │   │   │   ├── header.ts               # Sin link Admin público
-│   │   │   │   └── footer.ts               # Email + Instagram con íconos y links
+│   │   │   │   ├── header.ts
+│   │   │   │   └── footer.ts
 │   │   │   ├── features/
 │   │   │   │   ├── home/home.ts
 │   │   │   │   ├── catalog/catalog.ts
-│   │   │   │   ├── product-detail/product-detail.ts  # Producto reactivo a cambios de ruta
-│   │   │   │   ├── cart/cart.ts            # Checkout con formulario de envío + MP redirección
+│   │   │   │   ├── product-detail/product-detail.ts
+│   │   │   │   ├── cart/cart.ts
 │   │   │   │   ├── admin/
-│   │   │   │   │   ├── admin.ts            # Tabs: Productos/Líneas/Categorías/Dashboard
+│   │   │   │   │   ├── admin.ts
 │   │   │   │   │   ├── admin-login.ts
 │   │   │   │   │   ├── admin.guard.ts
-│   │   │   │   │   ├── product-list.ts     # Listado de productos
-│   │   │   │   │   ├── product-form.ts     # Selects línea/categoría desde API + "Agregar nueva"
-│   │   │   │   │   ├── lineas.ts           # CRUD de líneas
-│   │   │   │   │   ├── categorias.ts       # CRUD de categorías por línea
-│   │   │   │   │   └── dashboard.ts        # Ranking con ApexCharts
+│   │   │   │   │   ├── product-list.ts
+│   │   │   │   │   ├── product-form.ts
+│   │   │   │   │   ├── lineas.ts
+│   │   │   │   │   ├── categorias.ts
+│   │   │   │   │   └── dashboard.ts
 │   │   │   │   ├── checkout/
-│   │   │   │   │   ├── success.ts          # Verifica pago contra backend
+│   │   │   │   │   ├── success.ts
 │   │   │   │   │   ├── failure.ts
 │   │   │   │   │   └── pending.ts
 │   │   │   │   └── not-found/not-found.ts
-│   │   │   ├── app.routes.ts               # Admin con children + /checkout/*
-│   │   │   ├── app.config.ts               # Scroll restoration + interceptor
-│   │   │   └── app.ts / app.html / app.css
-│   │   ├── index.html                      # + preconnect Cloudinary
+│   │   │   ├── app.routes.ts
+│   │   │   ├── app.config.ts
+│   │   │   └── app.ts
+│   │   ├── index.html
 │   │   └── styles.css
-│   ├── angular.json / proxy.conf.mjs       # Proxy :4200 → :8080
+│   ├── angular.json
+│   ├── proxy.conf.mjs                       # Proxy :4200 → :8080 (desarrollo)
+│   ├── vercel.json                          # Build, output, rewrites /api/* → Railway
 │   ├── tailwind.config.js / postcss.config.js
-│   └── package.json                        # + ng-apexcharts, apexcharts
+│   └── package.json
 ├── documentacion.md
 ├── prompt-seccion-admin-segura.md
 ├── prompt-panel-administracion.md
@@ -124,17 +131,48 @@ PequenaNube/
 └── backGroundWeb.png / logo.ico / logo.png
 ```
 
-## Stack técnico implementado
+## Stack técnico
 
-- **Backend**: Spring Boot 4.1.0 + Spring Security 7 + Spring Data JPA + H2
-- **Auth**: JWT (jjwt 0.12.6) + BCrypt, sesión stateless, CORS restrictivo
+- **Backend**: Spring Boot 4.1.0 + Spring Security 7 + Spring Data JPA + PostgreSQL
+- **Auth**: JWT (jjwt 0.12.6) + BCrypt, sesión stateless
 - **Pagos**: Mercado Pago Checkout Pro (SDK Java 2.1.28)
 - **Frontend**: Angular 21 standalone + signals + Tailwind CSS v3
 - **Gráficos**: ApexCharts (ng-apexcharts)
-- **Testing**: Vitest (frontend)
+- **Testing**: Vitest (frontend) — cobertura pendiente
 - **Imágenes**: Cloudinary (subida desde admin con upload widget)
-- **Base de datos**: H2 file-based (./data/pnube)
-- **Repositorio**: GitHub — https://github.com/DualDjinn/TiendaPequenaNube
+- **Infra**: Railway (backend Docker) + Vercel (frontend SPA)
+- **Repositorio**: https://github.com/DualDjinn/TiendaPequenaNube
+
+## Despliegue
+
+### Railway (Backend)
+
+- **URL**: https://tiendapequenanube-production.up.railway.app
+- **Build**: Dockerfile multi-stage (JDK 21, Maven build, JRE runtime)
+- **Base de datos**: PostgreSQL (servicio vinculado)
+
+Variables de entorno requeridas:
+
+| Variable | Descripción |
+|----------|-------------|
+| `JWT_SECRET` | Clave HMAC-SHA256 (mín. 32 caracteres) |
+| `ADMIN_PASSWORD` | Contraseña del panel admin |
+| `MP_ACCESS_TOKEN` | Token de Mercado Pago (producción o test) |
+| `CORS_ORIGIN` | Origen permitido CORS (ej: https://tienda-pequena-nube.vercel.app) |
+| `MP_SUCCESS_URL` | URL de retorno post-pago exitoso |
+| `MP_FAILURE_URL` | URL de retorno post-pago fallido |
+| `MP_PENDING_URL` | URL de retorno post-pago pendiente |
+
+Las variables `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` las inyecta Railway automáticamente al vincular PostgreSQL.
+
+### Vercel (Frontend)
+
+- **URL**: https://tienda-pequena-nube.vercel.app
+- **Build**: `ng build` → output `dist/pnube/browser`
+- **Rewrite**: `/api/*` → Railway backend (sin CORS del lado del browser)
+- **SPA**: todas las rutas sirven `index.html`
+
+---
 
 ## Historial de cambios
 
@@ -174,54 +212,58 @@ PequenaNube/
 - Proxy de desarrollo apunta a localhost:8080
 
 ### v5 — UI/UX, responsive, quick-view
-- **WhatsApp bubble**: Botón flotante con wa.me/5493517543485
-- **Seguridad**: Eliminado link "Admin" del header público
-- **Fix images**: Backend devuelve string → frontend transforma a array
-- **Fix atributos**: Campos planos (material, color, yarnType, size)
-- **Modelo Product**: Simplificado sin objetos anidados
-- **Responsive audit**: 16 arreglos en 8 componentes
-- **Scroll restoration**: `withInMemoryScrolling`
-- **Quick-view modal**: Bottom sheet mobile con galería y agregar al carrito
-- **Product-card**: Simplificada, altura fija 110px, botón al fondo
-- **Tags**: Mismo tamaño, fuente y padding
-- **isNew automático**: createdAt + 7 días de vigencia
-- **Footer**: Email e Instagram con íconos clickeables
-- **Preconnect**: Cloudinary
+- WhatsApp bubble, seguridad, fix imágenes, responsive audit (16 arreglos)
+- Quick-view modal mobile, product-card simplificada
+- isNew automático, footer con íconos, preconnect Cloudinary
 
-### v6 — Panel admin completo + Checkout + Mercado Pago + GitHub
-- **Líneas y Categorías**: Nuevas entidades JPA con CRUD desde el admin
-- **Producto refactor**: FK a Categoria, `productLine`/`category` como @Transient
-- **Soft delete**: Productos, líneas y categorías con `activo` booleano
-- **Dashboard**: Ranking de ventas con ApexCharts (top productos + evolución mensual)
-- **Checkout**: Formulario de envío (nombre, dirección, teléfono)
-- **Mercado Pago**: Integración con Checkout Pro (crear preferencia, webhook, confirmación)
-- **Páginas de resultado**: /checkout/success, /failure, /pending
-- **Errores mejorados**: Logging detallado de API MP + mensajes al usuario
-- **Secrets externalizados**: Credenciales MP, JWT y admin password por variables de entorno
-- **.gitignore**: Excluye build, data H2, node_modules y secrets
-- **Repositorio GitHub**: Inicializado y subido a DualDjinn/TiendaPequenaNube
+### v6 — Panel admin completo + Checkout + Mercado Pago
+- Líneas y Categorías: CRUD desde el admin
+- Soft delete, Dashboard con ApexCharts
+- Checkout + Mercado Pago Checkout Pro
+- Secrets externalizados a variables de entorno
+
+### v7 — Deploy Railway + Vercel + Auditoría de seguridad
+- Migración H2 → PostgreSQL
+- Railway deploy con Dockerfile (JDK 21)
+- Vercel deploy con vercel.json (rewrite /api/* → Railway)
+- Fix race condition en product-detail (effect + loading state)
+- Fix mobile double-navigation (preventDefault en product-card)
+- Swagger de endpoints protegidos (anyRequest → hasRole ADMIN)
+- JWT_SECRET y ADMIN_PASSWORD sin defaults (obligatorios via env)
+- @ControllerAdvice global + ResourceNotFoundException
+- Validación de usuario y rol real en JwtAuthenticationFilter
+- Bug fix: confirmarPago buscaba en columna incorrecta (mpPreferenceId vs ID)
+- Endpoint ranking expuesto: GET /api/admin/ventas/ranking
+- MercadoPagoController: validación de inputs + logging
+- Frontend: eliminado button.ts no usado, app.css vacío, console.log
+
+---
 
 ## Cómo correr el proyecto
 
 ### Desarrollo local
 
 ```bash
-# Terminal 1 — Backend (Spring Boot + H2)
+# Terminal 1 — Backend (Spring Boot + PostgreSQL)
 cd backend
-$env:MP_ACCESS_TOKEN="APP_USR-3919..."   # Opcional, solo para pagos
+$env:JWT_SECRET="mi-secreto-de-256-bits-para-desarrollo-local"
+$env:ADMIN_PASSWORD="admin123"
+$env:MP_ACCESS_TOKEN="TEST-..."
 mvn spring-boot:run                       # http://localhost:8080
 
 # Terminal 2 — Frontend (Angular)
 cd PequenaNube
 ng serve                                  # http://localhost:4200
 ng test                                   # Tests unitarios
-ng build                                  # Build de producción en dist/
+ng build                                  # Build de producción en dist/pnube/browser
 ```
 
 ### Credenciales por defecto (desarrollo)
 
 - **Admin**: `admin` / `admin123`
-- Se configuran vía variables de entorno: `ADMIN_PASSWORD`, `JWT_SECRET`
+- Configurar vía variables de entorno: `ADMIN_PASSWORD`, `JWT_SECRET`
+
+---
 
 ## API — Endpoints públicos
 
@@ -229,24 +271,30 @@ ng build                                  # Build de producción en dist/
 |---|---|---|
 | `/api/auth/login` | POST | Login admin → devuelve JWT |
 | `/api/products` | GET | Catálogo público (solo activos) |
+| `/api/products/by-slug/{slug}` | GET | Producto por slug |
 | `/api/products/{id}` | GET | Detalle de producto |
 | `/api/ventas` | POST | Checkout (crea preferencia MP + redirige) |
+| `/api/categorias` | GET | Categorías (públicas) |
+| `/api/categorias/linea/{lineaId}` | GET | Categorías por línea |
+| `/api/lineas` | GET | Líneas (públicas) |
 | `/api/mercadopago/webhook` | POST | Webhook IPN de MP |
-| `/api/mercadopago/confirm` | POST | Confirmar pago desde frontend |
+| `/api/mercadopago/notifications` | POST | Webhook IPN de MP |
 
-## API — Endpoints de admin (requieren JWT)
+## API — Endpoints de admin (requieren JWT + rol ADMIN)
 
 | Endpoint | Método | Descripción |
 |---|---|---|
 | `/api/products` | POST | Crear producto (?categoriaId=N) |
 | `/api/products/{id}` | PUT | Editar producto |
 | `/api/products/{id}` | DELETE | Soft delete producto |
-| `/api/lineas` | GET/POST | Listar/crear líneas |
+| `/api/lineas` | POST | Crear línea |
 | `/api/lineas/{id}` | PUT/DELETE | Editar/desactivar línea |
-| `/api/categorias/linea/{id}` | GET | Categorías por línea |
 | `/api/categorias` | POST | Crear categoría |
 | `/api/categorias/{id}` | PUT/DELETE | Editar/desactivar categoría |
 | `/api/admin/ventas/ranking` | GET | Ranking de ventas (?mes=&anio=) |
+| `/api/mercadopago/confirm` | POST | Confirmar pago desde frontend |
+
+---
 
 ## Flujo de checkout
 
@@ -254,60 +302,56 @@ ng build                                  # Build de producción en dist/
 1. Usuario agrega productos al carrito
 2. Abre el carrito → "Finalizar compra"
 3. Completa formulario: Nombre, Dirección, Teléfono
-4. Redirige a Mercado Pago Checkout Pro
-5. Paga en MP (tarjeta, transferencia, efectivo)
-6. MP redirige a /checkout/success?payment_id=XXX
-7. Frontend verifica el pago contra POST /api/mercadopago/confirm
-8. Backend consulta API de MP, confirma, descuenta stock
-9. Venta queda como APROBADA en la base de datos
+4. POST /api/ventas → crea preferencia en MP
+5. Redirige a Mercado Pago Checkout Pro
+6. Paga en MP (tarjeta, transferencia, efectivo)
+7. MP redirige a /checkout/success?payment_id=XXX
+8. Frontend verifica POST /api/mercadopago/confirm
+9. Backend consulta API de MP, confirma, descuenta stock
+10. MP envía webhook a /api/mercadopago/webhook (notificación adicional)
 ```
 
-## Mercado Pago — Configuración
-
-Las credenciales se configuran vía variables de entorno:
-
-```bash
-$env:MP_ACCESS_TOKEN="APP_USR-..."       # Producción
-# o
-$env:MP_ACCESS_TOKEN="TEST-..."           # Sandbox (desarrollo)
-```
-
-En `application.yml` las URLs de retorno están fijas para desarrollo local:
-- `http://localhost:4200/checkout/success`
-- `http://localhost:4200/checkout/failure`
-- `http://localhost:4200/checkout/pending`
-
-Para producción, cambiar estas URLs.
-
-## Admin panel
-
-- **URL**: http://localhost:4200/admin/login
-- **Pestañas**: Productos / Líneas / Categorías / Dashboard
-- **Productos**: Listado con edición, soft delete, creación con línea+categoría dinámicas
-- **Líneas**: CRUD, no se puede desactivar si tiene categorías activas
-- **Categorías**: CRUD por línea, opción "+ Agregar nueva" al crear producto
-- **Dashboard**: Gráficos de ranking de ventas (ApexCharts)
+---
 
 ## Seguridad
 
-- Spring Security + JWT. Endpoints GET `/api/products` públicos.
-- POST/PUT/DELETE requieren rol ADMIN y token JWT en header `Authorization: Bearer <token>`.
+- Spring Security + JWT stateless.
+- Endpoints GET públicos: `/api/products`, `/api/categorias`, `/api/lineas`.
+- POST / PUT / DELETE requieren rol ADMIN y JWT en header `Authorization: Bearer <token>`.
 - Contraseñas hasheadas con BCrypt.
-- Checkout público (no requiere login para comprar).
-- Mercado Pago: nunca se confía en datos del frontend, siempre se verifica contra API de MP.
-- Secrets externalizados a variables de entorno (no en el repositorio).
+- CORS con orígenes específicos vía `CORS_ORIGIN` (no `*`).
+- JWT filter verifica que el usuario exista en BD y use su rol real.
+- `JWT_SECRET` y `ADMIN_PASSWORD` sin defaults — obligatorios en producción.
+- Expiración JWT configurable vía `JWT_EXPIRATION_MS` (default 1h).
+- Manejo global de errores con `@RestControllerAdvice` (no filtra stack traces).
+- Mercado Pago: validaciones server-side, webhook con logging.
 
-## GitHub
+---
 
-- **URL**: https://github.com/DualDjinn/TiendaPequenaNube
-- El repo incluye backend + frontend en un mismo proyecto
-- `.env.example` con las variables necesarias para desarrollo
-- `.gitignore` excluye build, node_modules, data H2 y secrets
+## Resultados de auditoría de seguridad (Julio 2026)
+
+| Prioridad | Hallazgo | Estado |
+|-----------|----------|--------|
+| 🔴 Crítico | `anyRequest().permitAll()` | ✅ Corregido → `hasRole(ADMIN)` |
+| 🔴 Crítico | JWT_SECRET con default hardcodeado | ✅ Corregido → sin default |
+| 🔴 Crítico | ADMIN_PASSWORD con default | ✅ Corregido → sin default |
+| 🔴 Crítico | Bug: confirmarPago columna incorrecta | ✅ Corregido |
+| 🟠 Alto | Sin @ControllerAdvice global | ✅ Agregado |
+| 🟠 Alto | JWT filter no verificaba usuario en BD | ✅ Corregido |
+| 🟠 Alto | Ranking endpoint no expuesto | ✅ Agregado |
+| 🟡 Medio | Expiración JWT 24h | ✅ Reducido a 1h |
+| 🟡 Medio | console.log datos personales | ✅ Eliminado |
+| 🟡 Medio | button.ts componente no usado | ✅ Eliminado |
+| 🔵 Info | app.css vacío | ✅ Eliminado |
+| 🔵 Info | Sin tests (backened y frontend) | Pendiente |
+
+---
 
 ## Limitaciones actuales
 
 - El JWT se almacena en `sessionStorage` (se pierde al cerrar pestaña). No hay refresh token.
 - No hay rate limiting ni 2FA en el admin.
-- Mercado Pago en desarrollo local requiere HTTPS o flujo manual (sin auto-return).
-- No hay checkout con datos de tarjeta embebido (solo redirección a MP).
-- Stock: no hay manejo de race conditions para compras simultáneas.
+- No hay tests automatizados (backened ni frontend).
+- Stock: no hay manejo de race conditions para compras simultáneas (falta optimistic locking).
+- Las entities se exponen directamente en los endpoints REST (sin DTOs en todos los casos).
+- No hay validación de firma HMAC en webhook de Mercado Pago.
