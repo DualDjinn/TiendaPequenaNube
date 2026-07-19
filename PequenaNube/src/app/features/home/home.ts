@@ -120,15 +120,15 @@ interface CategoryDef {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="p-4 border border-stone/20 rounded-lg text-center">
               <span class="text-2xl mb-2 block">✧</span>
-              <h4 class="font-medium text-sm">Hecho a mano</h4>
+              <h3 class="font-medium text-sm">Hecho a mano</h3>
             </div>
             <div class="p-4 border border-stone/20 rounded-lg text-center">
               <span class="text-2xl mb-2 block">✦</span>
-              <h4 class="font-medium text-sm">Materiales de calidad</h4>
+              <h3 class="font-medium text-sm">Materiales de calidad</h3>
             </div>
             <div class="p-4 border border-stone/20 rounded-lg text-center">
               <span class="text-2xl mb-2 block">♡</span>
-              <h4 class="font-medium text-sm">Envío cuidado</h4>
+              <h3 class="font-medium text-sm">Envío cuidado</h3>
             </div>
           </div>
         </div>
