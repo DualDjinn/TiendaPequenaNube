@@ -4,5 +4,16 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "https://tiendapequenanube-production.up.railway.app/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.mercadopago.com https://*.mercadopago.com.ar https://*.mercadopago.com.br; frame-src 'self' https://*.mercadopago.com https://*.mercadopago.com.ar;"
+        }
+      ]
+    }
   ]
 }
