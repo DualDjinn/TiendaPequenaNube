@@ -7,9 +7,9 @@ module.exports = {
     extend: {
       colors: {
         cream: '#FAF6F1',
-        coral: '#F4A6A0',
-        sage: '#B7D9C4',
-        mustard: '#FFD36E',
+        coral: '#9e3fff',
+        sage: '#05cf5b',
+        mustard: '#ff9a37',
         ink: '#3A3532',
         stone: '#8C8378',
       },

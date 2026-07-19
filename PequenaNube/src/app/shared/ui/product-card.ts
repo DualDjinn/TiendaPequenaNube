@@ -16,10 +16,10 @@ import { Badge } from './badge';
         @if (product().isNew || product().isSale) {
           <div class="absolute top-2 right-2 flex flex-col gap-1">
             @if (product().isNew) {
-              <app-badge color="#F4A6A0">Nuevo</app-badge>
+              <app-badge color="#9e3fff">Nuevo</app-badge>
             }
             @if (product().isSale) {
-              <app-badge color="#FFD36E">Oferta</app-badge>
+              <app-badge color="#ff9a37">Oferta</app-badge>
             }
           </div>
         }

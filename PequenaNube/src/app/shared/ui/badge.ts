@@ -21,5 +21,5 @@ import { Component, input } from '@angular/core';
   },
 })
 export class Badge {
-  readonly color = input('#F4A6A0');
+  readonly color = input('#9e3fff');
 }
