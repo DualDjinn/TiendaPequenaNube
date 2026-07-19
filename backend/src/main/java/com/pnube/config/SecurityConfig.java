@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categorias/**", "/api/lineas/**").permitAll()
                 .requestMatchers("/api/ventas").permitAll()
-                .requestMatchers("/api/mercadopago/webhook", "/api/mercadopago/notifications").permitAll()
+                .requestMatchers("/api/mercadopago/webhook", "/api/mercadopago/notifications", "/api/mercadopago/confirm").permitAll()
                 .requestMatchers("/api/**").hasRole("ADMIN")
                 .anyRequest().hasRole("ADMIN")
             )
