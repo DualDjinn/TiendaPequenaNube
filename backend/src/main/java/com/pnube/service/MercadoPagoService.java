@@ -66,6 +66,7 @@ public class MercadoPagoService {
                 .items(items)
                 .externalReference(venta.getId().toString())
                 .backUrls(backUrls)
+                .autoReturn("approved")
                 .build();
 
         PreferenceClient client = new PreferenceClient();
