@@ -124,14 +124,14 @@ export class ProductCard {
 
   private readonly lineConfigs: Record<string, { gradient: string; icon: string; bg: string; text: string }> = {
     'Joyería': {
-      gradient: 'conic-gradient(from 0deg, #FFD700, #FFF8DC, #D8B4FE, #FFD700)',
-      icon: '💎',
-      bg: 'bg-amber-100',
-      text: 'text-amber-600',
-    },
-    'Amigurumi': {
-      gradient: 'conic-gradient(from 0deg, #FED7AA, #FFF7ED, #A7F3D0, #FED7AA)',
-      icon: '🧶',
+        gradient: 'conic-gradient(from 0deg, #FFD700, #FFF8DC, #D8B4FE, #FFD700)',
+        icon: '🐱',
+        bg: 'bg-amber-100',
+        text: 'text-amber-600',
+      },
+      'Amigurumi': {
+        gradient: 'conic-gradient(from 0deg, #FED7AA, #FFF7ED, #A7F3D0, #FED7AA)',
+        icon: '🐶',
       bg: 'bg-green-100',
       text: 'text-green-600',
     },
