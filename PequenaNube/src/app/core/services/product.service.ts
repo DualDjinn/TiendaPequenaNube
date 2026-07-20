@@ -20,7 +20,7 @@ export class ProductService {
     };
     return {
       ...p,
-      productLine: lineMap[(p.productLine ?? '').toLowerCase()] ?? p.productLine,
+        productLine: lineMap[(p.productLine ?? '').normalize('NFC').toLowerCase()] ?? p.productLine,
       images: typeof p.images === 'string' ? [p.images] : p.images,
     };
   }
