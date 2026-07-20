@@ -138,10 +138,11 @@ export class ProductCard {
   };
 
   protected readonly lineConfig = computed(() => {
-    const key = (this.product()?.productLine ?? '').toLowerCase();
-    return (key.includes('joyer') || key.includes('jewel'))
-      ? this.lineConfigs['Joyería']
-      : this.lineConfigs['Amigurumi'];
+    const pl = (this.product()?.productLine ?? '').toLowerCase();
+    const cat = (this.product()?.category ?? '').toLowerCase();
+    const esJoya = ['anillos', 'aros', 'collares', 'pulseras', 'joyer', 'jewel'];
+    const isJoya = esJoya.some(k => pl.includes(k) || cat.includes(k));
+    return isJoya ? this.lineConfigs['Joyería'] : this.lineConfigs['Amigurumi'];
   });
 
   protected toggleLike(): void {
