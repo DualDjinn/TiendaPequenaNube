@@ -138,11 +138,9 @@ export class ProductCard {
   };
 
   protected readonly lineConfig = computed(() => {
-    const pl = (this.product()?.productLine ?? '').toLowerCase();
-    const cat = (this.product()?.category ?? '').toLowerCase();
-    const esJoya = ['anillos', 'aros', 'collares', 'pulseras', 'joyer', 'jewel'];
-    const isJoya = esJoya.some(k => pl.includes(k) || cat.includes(k));
-    return isJoya ? this.lineConfigs['Joyería'] : this.lineConfigs['Amigurumi'];
+    return this.product()?.productLine === 'jewelry'
+      ? this.lineConfigs['Joyería']
+      : this.lineConfigs['Amigurumi'];
   });
 
   protected toggleLike(): void {

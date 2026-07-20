@@ -14,7 +14,15 @@ export class ProductService {
   readonly error = signal<string | null>(null);
 
   private mapProduct(p: any): Product {
-    return { ...p, images: typeof p.images === 'string' ? [p.images] : p.images };
+    const lineMap: Record<string, string> = {
+      'joyería': 'jewelry',
+      'amigurumi': 'amigurumi',
+    };
+    return {
+      ...p,
+      productLine: lineMap[(p.productLine ?? '').toLowerCase()] ?? p.productLine,
+      images: typeof p.images === 'string' ? [p.images] : p.images,
+    };
   }
 
   private unmapProduct(p: Product): any {
