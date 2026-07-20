@@ -10,8 +10,6 @@ import { Linea } from '../../shared/models/linea';
 import { Categoria } from '../../shared/models/categoria';
 import { Product } from '../../shared/models/product';
 
-declare const cloudinary: any;
-
 @Component({
   selector: 'app-product-form',
   standalone: true,
@@ -75,7 +73,8 @@ declare const cloudinary: any;
               </div>
             }
           </div>
-          <button type="button" (click)="openUpload()" class="px-4 py-2 border border-stone/30 rounded-lg text-sm hover:border-coral transition-colors">+ Subir imagen</button>
+          <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/jpeg,image/png,image/webp" class="hidden" />
+          <button type="button" (click)="fileInput.click()" class="px-4 py-2 border border-stone/30 rounded-lg text-sm hover:border-coral transition-colors">+ Subir imagen</button>
         </div>
 
         <div>
@@ -122,7 +121,6 @@ export class ProductForm implements OnInit {
   protected readonly showNewCategoria = signal(false);
   protected readonly productLine = signal('');
   private editingId: number | null = null;
-  private widget: any = null;
 
   protected readonly form = this.fb.group({
     name: ['', Validators.required],
@@ -193,16 +191,20 @@ export class ProductForm implements OnInit {
     });
   }
 
-  protected openUpload(): void {
-    if (!this.widget) {
-      this.widget = cloudinary.createUploadWidget(
-        { cloudName: 'pjhkswfc', uploadPreset: 'imagenesNube', folder: 'pnube' },
-        (error: any, result: any) => {
-          if (result.event === 'success') this.imageList.update(list => [...list, result.info.secure_url]);
-        },
-      );
-    }
-    this.widget.open();
+  protected onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const formData = new FormData();
+    formData.append('file', input.files[0]);
+    this.http.post<{ url: string }>('/api/upload', formData).subscribe({
+      next: res => {
+        this.imageList.update(list => [...list, res.url]);
+        input.value = '';
+      },
+      error: () => {
+        input.value = '';
+      },
+    });
   }
 
   protected removeImage(index: number): void { this.imageList.update(list => list.filter((_, i) => i !== index)); }
