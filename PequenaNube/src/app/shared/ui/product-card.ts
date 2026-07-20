@@ -138,9 +138,10 @@ export class ProductCard {
   };
 
   protected readonly lineConfig = computed(() => {
-    const pl = this.product()?.productLine;
-    const key = pl ? pl.normalize('NFC').toLowerCase() : '';
-    return key === 'joyería' ? this.lineConfigs['Joyería'] : this.lineConfigs['Amigurumi'];
+    const key = (this.product()?.productLine ?? '').toLowerCase();
+    return (key.includes('joyer') || key.includes('jewel'))
+      ? this.lineConfigs['Joyería']
+      : this.lineConfigs['Amigurumi'];
   });
 
   protected toggleLike(): void {
