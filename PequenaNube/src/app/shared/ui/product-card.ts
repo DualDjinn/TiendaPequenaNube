@@ -16,7 +16,7 @@ import { CartService } from '../../core/services/cart.service';
       <div class="flex items-center gap-3 px-3 pt-3 pb-2">
         <div class="relative w-10 h-10 shrink-0 rounded-full avatar-ring"
              [style.background]="lineConfig().gradient">
-          <div class="absolute inset-[2px] rounded-full flex items-center justify-center text-base avatar-inner"
+          <div class="absolute inset-[2px] rounded-full flex items-center justify-center text-xl avatar-inner"
                [class]="lineConfig().bg + ' ' + lineConfig().text">
             {{ lineConfig().icon }}
           </div>
