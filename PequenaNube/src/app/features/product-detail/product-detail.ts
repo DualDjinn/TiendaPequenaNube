@@ -26,8 +26,17 @@ import { Product } from '../../shared/models/product';
         @let p = product()!;
         <div class="flex flex-col md:flex-row gap-8 mb-16" appScrollReveal>
           <div class="w-full md:w-1/2">
-            <div class="relative aspect-square overflow-hidden rounded-lg bg-stone/10">
-              <img [ngSrc]="p.images[0]" [alt]="p.name" fill class="object-cover" sizes="(max-width: 768px) 100vw, 50vw" priority />
+            <div class="relative aspect-square overflow-hidden rounded-lg bg-stone/10 group" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+              <img [ngSrc]="p.images[currentIndex()]" [alt]="p.name" fill class="object-cover" sizes="(max-width: 768px) 100vw, 50vw" priority />
+              @if (p.images.length > 1) {
+                <button type="button" (click)="prevImage()" class="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 rounded-full flex items-center justify-center text-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">‹</button>
+                <button type="button" (click)="nextImage()" class="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/80 rounded-full flex items-center justify-center text-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white">›</button>
+                <div class="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                  @for (img of p.images; track img; let i = $index) {
+                    <div class="w-1.5 h-1.5 rounded-full transition-all" [class]="i === currentIndex() ? 'bg-white scale-125' : 'bg-white/50'"></div>
+                  }
+                </div>
+              }
             </div>
           </div>
           <div class="w-full md:w-1/2 space-y-6">
@@ -78,6 +87,8 @@ export class ProductDetail implements OnInit {
 
   private readonly slug = signal<string | undefined>(undefined);
   protected readonly quantity = signal(1);
+  protected readonly currentIndex = signal(0);
+  private touchX = 0;
 
   protected readonly product = computed(() => {
     const s = this.slug();
@@ -93,6 +104,7 @@ export class ProductDetail implements OnInit {
     this.productService.loadAll();
     this.route.paramMap.subscribe(params => {
       this.quantity.set(1);
+      this.currentIndex.set(0);
       this.slug.set(params.get('slug') ?? undefined);
     });
   }
@@ -107,6 +119,26 @@ export class ProductDetail implements OnInit {
     if (!p) return [];
     return this.productService.products().filter(x => x.productLine === p.productLine && x.id !== p.id).slice(0, 4);
   });
+
+  protected prevImage(): void {
+    const p = this.product();
+    if (p) this.currentIndex.update(i => i === 0 ? p.images.length - 1 : i - 1);
+  }
+
+  protected nextImage(): void {
+    const p = this.product();
+    if (p) this.currentIndex.update(i => i === p.images.length - 1 ? 0 : i + 1);
+  }
+
+  protected onTouchStart(e: TouchEvent): void {
+    this.touchX = e.touches[0].clientX;
+  }
+
+  protected onTouchEnd(e: TouchEvent): void {
+    const delta = e.changedTouches[0].clientX - this.touchX;
+    if (delta > 50) this.prevImage();
+    else if (delta < -50) this.nextImage();
+  }
 
   protected addToCart(product?: Product): void {
     const p = product ?? this.product();
