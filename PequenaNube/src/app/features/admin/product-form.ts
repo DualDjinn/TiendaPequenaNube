@@ -97,6 +97,9 @@ import { Product } from '../../shared/models/product';
           <label class="flex items-center gap-2 text-sm"><input type="checkbox" formControlName="isSale" class="rounded" /> Oferta</label>
         </div>
 
+        @if (saveError(); as err) {
+          <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{{ err }}</div>
+        }
         <div class="flex flex-col sm:flex-row gap-4">
           <button type="submit" class="bg-coral hover:bg-coral/90 text-white px-8 py-3 rounded-lg font-medium text-sm transition-colors" [disabled]="form.invalid">{{ isEditing() ? 'Guardar cambios' : 'Crear producto' }}</button>
           <a routerLink="/admin" class="px-8 py-3 rounded-lg border border-stone/30 text-sm font-medium transition-colors hover:border-ink">Cancelar</a>
@@ -120,6 +123,7 @@ export class ProductForm implements OnInit {
   protected readonly categorias = signal<Categoria[]>([]);
   protected readonly showNewCategoria = signal(false);
   protected readonly productLine = signal('');
+  protected readonly saveError = signal<string | null>(null);
   private editingId: number | null = null;
 
   protected readonly form = this.fb.group({
@@ -228,16 +232,17 @@ export class ProductForm implements OnInit {
       yarnType: v.yarnType ?? '', size: v.size ?? '',
     };
 
+    this.saveError.set(null);
+    const handle = () => this.productService.loadAll();
+    const onError = (err: any) => {
+      const msg = err.error?.error ?? err.statusText ?? 'Error al guardar el producto';
+      this.saveError.set(msg);
+    };
+
     if (this.isEditing() && this.editingId) {
-      this.http.put(`/api/products/${this.editingId}?categoriaId=${catId}`, payload).subscribe(() => {
-        this.productService.loadAll();
-        this.router.navigate(['/admin']);
-      });
+      this.http.put(`/api/products/${this.editingId}?categoriaId=${catId}`, payload).subscribe({ next: () => { handle(); this.router.navigate(['/admin']); }, error: onError });
     } else {
-      this.http.post<Product>(`/api/products?categoriaId=${catId}`, payload).subscribe(() => {
-        this.productService.loadAll();
-        this.router.navigate(['/admin']);
-      });
+      this.http.post<Product>(`/api/products?categoriaId=${catId}`, payload).subscribe({ next: () => { handle(); this.router.navigate(['/admin']); }, error: onError });
     }
   }
 }

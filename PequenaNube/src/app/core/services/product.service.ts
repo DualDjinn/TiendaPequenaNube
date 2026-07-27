@@ -21,7 +21,7 @@ export class ProductService {
     return {
       ...p,
         productLine: lineMap[(p.productLine ?? '').normalize('NFC').toLowerCase()] ?? p.productLine,
-      images: typeof p.images === 'string' ? [p.images] : p.images,
+      images: typeof p.images === 'string' ? p.images.split(',').filter(Boolean) : p.images,
     };
   }
 
