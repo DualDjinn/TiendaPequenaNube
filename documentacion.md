@@ -261,7 +261,7 @@ Las variables `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` las inyec
   - Ignora `/api/auth/login` (login fallido no desloguea) y requests sin token (visita pública no se redirige).
   - Nuevo test: `auth.interceptor.spec.ts` (5 tests).
 - **Fix test pre-existente**: mock de Router en `auth.service.spec` usaba `navigateByUrl` en vez de `navigate`.
-- **Cambio de color**: fondo del `body` → rosa `#FFD1E4`.
+- **Cambio de color**: fondo del `body` → rosa `#FFE8F1`.
 - **Tests frontend**: 41 → 46.
 
 ---
