@@ -5,7 +5,7 @@
 **Backend**: ✅ Spring Boot 4.1.0 + PostgreSQL (via Railway)
 **Frontend**: ✅ Angular 21 standalone (via Vercel)
 **Deploy**: ✅ Railway (backend Docker) + Vercel (frontend SPA)
-**Tests**: ✅ 95 backend (JUnit 5 + Mockito) + 41 frontend (Angular TestBed) = 136 total
+**Tests**: ✅ 95 backend (JUnit 5 + Mockito) + 46 frontend (Angular TestBed) = 141 total
 **Cobertura**: ✅ JaCoCo 90%+ por paquete
 **GitHub**: ✅ https://github.com/DualDjinn/TiendaPequenaNube
 
@@ -256,6 +256,14 @@ Las variables `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` las inyec
 - **CSP**: `connect-src`, `style-src`, `upload-widget.cloudinary.com` en Vercel
 - **Ventas del día**: tabla en dashboard con datos del comprador y # comprobante MP
 
+### v9 — Auto-logout por token expirado + fondo rosa nuevo
+- **Fix**: manejo de expiración del JWT (1h). Ante un 401/403 con token presente, el interceptor cierra sesión automáticamente y redirige a `/admin/login` (antes quedaba un 403 silencioso al editar/crear/borrar productos).
+  - Ignora `/api/auth/login` (login fallido no desloguea) y requests sin token (visita pública no se redirige).
+  - Nuevo test: `auth.interceptor.spec.ts` (5 tests).
+- **Fix test pre-existente**: mock de Router en `auth.service.spec` usaba `navigateByUrl` en vez de `navigate`.
+- **Cambio de color**: fondo del `body` de `#ffc4f9` → `#E7AEC5`.
+- **Tests frontend**: 41 → 46.
+
 ---
 
 ## Cómo correr el proyecto
@@ -432,18 +440,18 @@ mvn test        # Tests
 mvn verify      # Tests + JaCoCo coverage check
 ```
 
-### Frontend — 41 tests (Angular TestBed + Vitest)
+### Frontend — 46 tests (Angular TestBed + Vitest)
 
 | Tipo | Archivos | Tests |
 |------|----------|-------|
-| Services | 10 | 13 |
+| Services | 11 | 18 |
 | Pages | 8 | 8 |
 | Admin | 6 | 6 |
 | UI Components | 7 | 7 |
 | Layout | 2 | 2 |
 | Guards | 1 | 1 |
 | Config | 1 | 3 |
-| **Total** | **35** | **41** |
+| **Total** | **25** | **46** |
 
 Ejecutar:
 ```bash
@@ -476,7 +484,7 @@ npx vitest run --coverage  # Coverage
 
 ## Limitaciones actuales
 
-- El JWT se almacena en `sessionStorage` (se pierde al cerrar pestaña). No hay refresh token.
+- El JWT se almacena en `sessionStorage` (se pierde al cerrar pestaña). No hay refresh token; al vencer, el interceptor cierra sesión y redirige a `/admin/login`.
 - No hay rate limiting ni 2FA en el admin.
 - Stock: no hay manejo de race conditions para compras simultáneas (falta optimistic locking).
 - Las entities se exponen directamente en los endpoints REST (sin DTOs en todos los casos).

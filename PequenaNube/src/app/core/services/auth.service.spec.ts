@@ -13,7 +13,7 @@ describe('AuthService', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         AuthService,
-        { provide: Router, useValue: { navigateByUrl: vi.fn() } },
+        { provide: Router, useValue: { navigate: vi.fn() } },
       ],
     });
     httpMock = TestBed.inject(HttpTestingController);
