@@ -145,7 +145,7 @@ PequenaNube/
 - **Pagos**: Mercado Pago Checkout Pro (SDK Java 2.1.28)
 - **Imágenes**: Cloudinary (subida server-side, API key nunca expuesta)
 - **Frontend**: Angular 21 standalone + signals + Tailwind CSS v3
-- **Paleta**: Coral `#9e3fff`, Sage `#05cf5b`, Mustard `#ff9a37`, Ink `#3A3532`, Stone `#8C8378`, Cream `#FAF6F1`
+- **Paleta**: Coral `#FF9E8B` (acento Amigurumis), Coral Dark `#FF7A61`, Lila `#B994E8` (acento Joyería), Lila Dark `#9C6FD8`, Fondo `#FFF8F4`, Fondo soft `#FFF1EC`, Texto `#4A3A50`, Texto soft `#8A7690`, Ciruela `#3A2C40` + tokens legacy (Ink/Stone/Cream/Sage/Mustard) en páginas fuera de home
 - **Gráficos**: ApexCharts (ng-apexcharts)
 - **Testing**: JUnit 5 + Mockito (backend), Vitest (frontend), JaCoCo 0.8.15
 - **Infra**: Railway (backend Docker) + Vercel (frontend SPA)
@@ -261,8 +261,17 @@ Las variables `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD` las inyec
   - Ignora `/api/auth/login` (login fallido no desloguea) y requests sin token (visita pública no se redirige).
   - Nuevo test: `auth.interceptor.spec.ts` (5 tests).
 - **Fix test pre-existente**: mock de Router en `auth.service.spec` usaba `navigateByUrl` en vez de `navigate`.
-- **Cambio de color**: fondo del `body` → rosa `#FFE8F1`.
+- **Cambio de color**: fondo del `body` → crema `#FFF8F4`.
 - **Tests frontend**: 41 → 46.
+
+### v10 — Rediseño visual kawaii/pastel (según redesigne.md)
+- **Nueva paleta** en `tailwind.config.js`: acento coral `#FF9E8B` para Amigurumis y lila `#B994E8` para Joyería, fondo crema `#FFF8F4`, texto `#4A3A50`. Body background → `#FFF8F4`.
+- **Tipografía**: cuerpo pasa de Nunito Sans a **Quicksand** (Baloo 2 se mantiene para títulos).
+- **Cards de producto**: se conserva la estructura Instagram completa (avatar, like/share/bookmark, descripción, CTA) — solo cambian los acentos por línea (coral/lila) y radios/sombras suaves.
+- **Header**: nav en píldora, carrito circular con sombra cálida.
+- **Home reestructurado**: hero con `backGroundWeb.png` adaptado (overlay crema), eyebrow "✨ Hecho a mano, con amor", título con degradé coral-lila, 2 CTAs, chips flotantes; secciones de producto Amigurumis (acento coral) y Joyería (acento lila); franja de confianza; newsletter con fondo degradé de marca; "Sobre" conservado.
+- **Footer**: fondo ciruela `#3A2C40` con texto en lilas claros.
+- Tokens legacy (ink/stone/cream/sage/mustard) se mantienen para catálogo/detalle/cart/admin/checkout.
 
 ---
 

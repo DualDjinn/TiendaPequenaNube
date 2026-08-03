@@ -3,7 +3,23 @@
 @tailwind utilities;
 
 body {
-  color: #3A3532;
+  color: #4A3A50;
+}
+
+.btn-pill {
+  border-radius: 999px;
+}
+
+.card-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px -12px rgba(150, 100, 130, 0.25);
+}
+
+.blob {
+  border-radius: 60% 40% 55% 45% / 55% 45% 60% 40%;
 }
 
 @keyframes fade-in-carousel {

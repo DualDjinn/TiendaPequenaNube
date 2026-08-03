@@ -9,27 +9,28 @@ import { CartDrawerService } from '../core/services/cart-drawer.service';
   standalone: true,
   imports: [RouterLink, NgOptimizedImage],
   template: `
-    <header class="sticky top-0 z-40 bg-cream/95 backdrop-blur-sm border-b border-stone/10">
+    <header class="sticky top-0 z-40 bg-bg/95 backdrop-blur-sm border-b border-textSoft/10">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16">
-          <a routerLink="/" class="block">
+          <a routerLink="/" class="flex items-center gap-2">
             <img ngSrc="images/logo.png" alt="Pequeña Nube" width="100" height="81" priority class="h-auto w-auto max-h-9" />
+            <span class="hidden sm:block font-heading font-bold text-lg text-text">Pequeña Nube</span>
           </a>
-          <nav class="hidden md:flex items-center gap-6 text-base font-medium">
-            <a routerLink="/" class="hover:text-coral transition-colors">Inicio</a>
-            <a routerLink="/catalogo" [queryParams]="{linea: 'amigurumi'}" class="hover:text-coral transition-colors">Amigurumis</a>
-            <a routerLink="/catalogo" [queryParams]="{linea: 'jewelry'}" class="hover:text-coral transition-colors">Joyería</a>
-            <a routerLink="/catalogo" class="hover:text-coral transition-colors">Todo</a>
-            <a routerLink="/" fragment="sobre-pnube" class="hover:text-coral transition-colors">Sobre Pequeña Nube</a>
+          <nav class="hidden md:flex items-center gap-1 rounded-full bg-white/70 px-1.5 py-1.5 shadow-warm">
+            <a routerLink="/" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-coral/20 hover:text-coralDark transition-colors">Inicio</a>
+            <a routerLink="/catalogo" [queryParams]="{linea: 'amigurumi'}" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-coral/20 hover:text-coralDark transition-colors">Amigurumis</a>
+            <a routerLink="/catalogo" [queryParams]="{linea: 'jewelry'}" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-lilac/30 hover:text-lilacDark transition-colors">Joyería</a>
+            <a routerLink="/catalogo" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-coral/20 hover:text-coralDark transition-colors">Todo</a>
+            <a routerLink="/" fragment="sobre-pnube" class="px-4 py-2 rounded-full text-sm font-medium hover:bg-coral/20 hover:text-coralDark transition-colors">Sobre nosotras</a>
           </nav>
           <div class="flex items-center gap-4">
-            <button (click)="drawer.open()" class="relative p-2 hover:text-coral transition-colors" aria-label="Abrir carrito">
+            <button (click)="drawer.open()" class="relative w-10 h-10 rounded-full bg-white shadow-warm flex items-center justify-center hover:text-coralDark transition-colors" aria-label="Abrir carrito">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
               </svg>
               @if (cart.totalItems() > 0) {
-                <span class="absolute -top-1 -right-1 w-5 h-5 bg-coral text-white text-xs rounded-full flex items-center justify-center cart-bounce">{{ cart.totalItems() }}</span>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-coralDark text-white text-xs rounded-full flex items-center justify-center cart-bounce">{{ cart.totalItems() }}</span>
               }
             </button>
             <button (click)="mobileMenu.set(!mobileMenu())" class="md:hidden p-3" aria-label="Menú">
@@ -41,12 +42,12 @@ import { CartDrawerService } from '../core/services/cart-drawer.service';
         </div>
       </div>
       @if (mobileMenu()) {
-        <div class="md:hidden border-t border-stone/10 px-4 py-4 space-y-3 text-base font-medium">
+        <div class="md:hidden border-t border-textSoft/10 px-4 py-4 space-y-3 text-base font-medium">
           <a routerLink="/" class="block" (click)="mobileMenu.set(false)">Inicio</a>
           <a routerLink="/catalogo" [queryParams]="{linea: 'amigurumi'}" class="block" (click)="mobileMenu.set(false)">Amigurumis</a>
           <a routerLink="/catalogo" [queryParams]="{linea: 'jewelry'}" class="block" (click)="mobileMenu.set(false)">Joyería</a>
           <a routerLink="/catalogo" class="block" (click)="mobileMenu.set(false)">Todo</a>
-          <a routerLink="/" fragment="sobre-pnube" class="block" (click)="mobileMenu.set(false)">Sobre Pequeña Nube</a>
+          <a routerLink="/" fragment="sobre-pnube" class="block" (click)="mobileMenu.set(false)">Sobre nosotras</a>
         </div>
       }
     </header>
