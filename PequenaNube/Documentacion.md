@@ -1,147 +1,66 @@
-# Pequeña Nube
+# Pequeña Nube — Frontend (Angular)
+
+> Documentación detallada y canónica del proyecto completo: [`../documentacion.md`](../documentacion.md).
 
 ## Descripción
 
-Tienda e-commerce de amigurumis tejidos a crochet y joyería de fantasía, hecha con Angular 21 standalone + Tailwind CSS v3 + json-server. Marca: **Pequeña Nube**.
+Frontend del e-commerce **Pequeña Nube** (amigurumis tejidos a crochet + joyería de fantasía). Angular 21 standalone + Signals + Tailwind CSS v3. El backend real es Spring Boot + PostgreSQL (Railway); ya **no** usa json-server.
 
 ## Stack técnico
 
 | Tecnología | Versión |
 |------------|---------|
-| Angular | 21.2 (standalone components, Signals) |
+| Angular | 21 (standalone components, Signals) |
 | Tailwind CSS | 3.4 (vía PostCSS) |
-| json-server | 0.17 (API REST mock) |
-| TypeScript | 5.9 |
-| Vitest | 4.0 (tests unitarios) |
-| Cloudinary | Upload widget + fetch (imágenes) |
+| TypeScript | ~5.9 |
+| Vitest | 4.x (tests unitarios vía `ng test`) |
+| Cloudinary | Subida server-side (endpoint `POST /api/upload` del backend) |
 | Build | `@angular/build:application` (Vite) |
 
 ## Arrancar el proyecto
 
 ```bash
-cd PequenaNube
-npm install
-# Terminal 1: json-server (API)
-npm run api
-# Terminal 2: Angular dev server
-ng serve
-# Abrir http://localhost:4200
-```
+# Terminal 1 — Backend (Spring Boot + PostgreSQL)
+cd ../backend
+$env:JWT_SECRET="..."          # y demás env vars (ver documentacion.md)
+mvn spring-boot:run            # http://localhost:8080
 
-- `npm run api` → json-server en puerto 3000 con `db.json`
-- `ng serve` → Angular en puerto 4200, proxy `/api` → 3000
+# Terminal 2 — Frontend
+ng serve                       # http://localhost:4200 (proxy /api → :8080)
+```
 
 ## Rutas
 
 | Ruta | Componente | Descripción |
 |------|-----------|-------------|
-| `/` | Home | Hero, categorías con carrusel, destacados, newsletter |
-| `/catalogo` | Catalog | Filtros por línea (todo/amigurumi/jewelry), categoría, precio |
-| `/producto/:slug` | ProductDetail | Vista completa + relacionados |
-| `/admin` | Admin | Tabla CRUD de productos |
-| `/admin/nuevo` | ProductForm | Crear producto |
-| `/admin/editar/:id` | ProductForm | Editar producto |
+| `/` | Home | Rediseño kawaii/pastel: hero, secciones Amigurumis/Joyería, trust strip, newsletter |
+| `/catalogo` | Catalog | Filtros por línea, categoría y precio (query params) |
+| `/producto/:slug` | ProductDetail | Detalle + galería con flechas y swipe |
+| `/admin/*` | Admin | Login, productos, líneas, categorías, dashboard |
+| `/checkout/{success,failure,pending}` | Checkout | Pantallas post-pago |
 | `**` | NotFound | 404 |
-
-## Arquitectura
-
-```
-src/app/
-├── core/services/       # ProductService, CartService, CartDrawerService, persistencia
-├── features/
-│   ├── home/            # Página principal
-│   ├── catalog/         # Catálogo con filtros
-│   ├── product-detail/  # Detalle de producto
-│   ├── cart/            # Carrito lateral (slide-in)
-│   ├── admin/           # Admin + formulario de producto
-│   └── not-found/       # 404
-├── layout/              # Header (sticky + carrito badge) y Footer
-├── shared/
-│   ├── directives/      # ScrollReveal (fade-in al hacer scroll)
-│   ├── models/          # Interfaces Product, CartItem, tipos
-│   └── ui/              # ProductCard, QuantitySelector, Badge, Button, Skeleton
-```
-
-## Modelo de datos (`db.json`)
-
-```json
-{
-  "products": [
-    {
-      "id": number,
-      "name": string,
-      "slug": string,
-      "price": number,
-      "images": string[],
-      "productLine": "amigurumi" | "jewelry",
-      "category": string,
-      "description": string,
-      "stock": number,
-      "isNew": boolean,
-      "isSale": boolean,
-      "jewelry?": { "material": string, "color": string },
-      "amigurumi?": { "yarnType": string, "size": string }
-    }
-  ]
-}
-```
-
-25 productos semilla (IDs 1-25): 13 amigurumis (Animales, Personajes, Llaveros, Decoracion) + 12 joyería (Anillos, Aros, Collares, Pulseras).
-
-## Paleta de colores (Tailwind)
-
-| Clase | Hex | Uso |
-|-------|-----|-----|
-| `cream` | `#FAF6F1` | Fondos claros (header, carrito) |
-| `coral` | `#F4A6A0` | Botones primarios, badges joyería |
-| `sage` | `#B7D9C4` | Badges amigurumi |
-| `mustard` | `#FFD36E` | Badge "Oferta" |
-| `ink` | `#3A3532` | Texto principal |
-| `stone` | `#8C8378` | Texto secundario, bordes |
-
-## Fuentes
-
-- **Títulos:** `Baloo 2` (clase `font-heading`)
-- **Cuerpo:** `Nunito Sans` (clase `font-sans`, default global)
 
 ## Funcionalidades clave
 
-- **Hero:** Imagen full-width con overlay degradado, logo + tagline con efecto arcoíris brillante (CSS `animate-rainbow-shine`), CTA "Elegí tu próximo favorito"
-- **Carrusel por categoría:** Cada categoría en home muestra imágenes de sus productos rotando cada 5s con fade-in, indicadores de punto
-- **Catálogo:** Filtros por línea de producto y categoría, ordenamiento por precio/fecha, query params en URL, loading skeleton, error con retry
-- **Detalle:** Atributos específicos por línea (material/color o yarnType/size), selector de cantidad con stock máximo, productos relacionados
-- **Carrito lateral:** Slide-in con overlay, persistencia en localStorage, stock validation, quantity selector, total + subtotal
-- **Admin:** CRUD completo, formulario con Cloudinary upload widget (unsigned, preset `imagenesNube`), soporte multi-imagen, slugs auto-generados
-- **ScrollReveal:** Fade-in con overshoot easing al hacer scroll (IntersectionObserver)
-- **Sin stock:** Botón "Sin stock" rojo y deshabilitado en cards y detalle, carrito rechaza agregar si excede stock
+- **Home rediseñado**: hero con imagen adaptada, eyebrow, título con degradé coral-lila, 2 CTAs, chips flotantes; secciones de producto por línea (Amigurumis acento coral, Joyería acento lila); franja de confianza; newsletter con degradé de marca.
+- **Cards estilo Instagram** (`product-card`): avatar con anillo animado, like/share/bookmark, descripción expandible, CTA "¡Lo quiero!" — estructura conservada, acentos por línea.
+- **Carrito lateral** con persistencia en localStorage y checkout con Mercado Pago.
+- **Panel admin**: CRUD de productos/líneas/categorías, dashboard con ApexCharts, ventas del día.
+- **Auto-logout** al expirar el token JWT: ante 401/403 redirige a `/admin/login`.
+- **Seguridad**: JWT stateless, subida de imágenes solo server-side (API key de Cloudinary nunca expuesta).
 
-## Imágenes
+## Paleta y fuentes
 
-- Cloudinary: cloud name `pjhkswfc`, upload preset `imagenesNube` (subida sin autenticación)
-- Image loader en `app.config.ts`: URLs absolutas pasan directo, `images/` pasan directo, todo lo demás via fetch de Cloudinary (`f_auto,q_auto`)
-- Widget script global en `index.html`
+- **Paleta**: Coral `#FF9E8B` (Amigurumis), Lila `#B994E8` (Joyería), Fondo `#FFF8F4`, Texto `#4A3A50`, Ciruela `#3A2C40` (footer).
+- **Fuentes**: `Baloo 2` (títulos, `font-heading`) + `Quicksand` (cuerpo, `font-sans`).
 
 ## Tests
 
 ```bash
-ng test    # Vitest
+ng test          # 46 tests (25 archivos) — ver ../documentacion.md para detalle y cobertura
 ```
 
-Test existente: `cart.service.spec.ts` (unit test del carrito).
+## Deploy
 
-## Archivos importantes
-
-- `src/styles.css` — Directivas Tailwind + keyframes personalizados
-- `tailwind.config.js` — Colores y fuentes custom
-- `proxy.conf.mjs` — Proxy `/api` → json-server
-- `db.json` — Base de datos json-server
-- `src/app/app.config.ts` — Providers globales (HTTP, router, image loader)
-- `src/app/core/services/product.service.ts` — CRUD de productos con Signals
-- `src/app/core/services/cart.service.ts` — Lógica del carrito con persistencia
-- `src/app/features/admin/product-form.ts` — Formulario con Cloudinary upload
-
-## Cloudinary
-
-- Cloud name: `pjhkswfc`
-- Upload preset: `imagenesNube` (unsigned)
-- Widget: `cloudinary.v2.openUploadWidget` global
+- **Frontend**: Vercel (SPA) — `vercel.json` con rewrites `/api/*` → Railway.
+- **Backend**: Railway (Docker + PostgreSQL).
